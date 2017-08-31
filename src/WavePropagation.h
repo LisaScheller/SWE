@@ -123,6 +123,10 @@ public:
 	 */
 	T computeNumericalFluxes();
 
+	T computeUnstableOrLaxFriedrichsFlux();
+
+
+
 	/**
 	 * Update the unknowns with the already computed net-updates
 	 *
@@ -135,6 +139,10 @@ public:
 	 * boundaries
 	 */
 	void setOutflowBoundaryConditions();
+
+    void updateUnknownsUnstable(T dt);
+
+    void updateUnknownsLaxFriedrichs(T dt);
 };
 
 

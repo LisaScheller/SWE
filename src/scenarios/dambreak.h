@@ -37,7 +37,7 @@
 #ifndef SCENARIOS_DAMBREAK_H_
 #define SCENARIOS_DAMBREAK_H_
 
-#include "types.h"
+#include "../types.h"
 
 namespace scenarios
 {

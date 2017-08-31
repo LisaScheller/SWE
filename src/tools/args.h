@@ -37,7 +37,7 @@
 #ifndef TOOLS_ARGS_H_
 #define TOOLS_ARGS_H_
 
-#include "tools/logger.h"
+#include "logger.h"
 
 #include <getopt.h>
 #include <cstdlib>

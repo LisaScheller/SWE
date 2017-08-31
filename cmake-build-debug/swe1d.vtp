@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<VTKFile type="Collection" version="0.1">
+<Collection>
+<DataSet timestep="00" group="" part="0" file="swe1d_0.vtr"/> 
+<DataSet timestep="7.48767e-180" group="" part="0" file="swe1d_1.vtr"/> 
+<DataSet timestep="1.49753e-170" group="" part="0" file="swe1d_2.vtr"/> 
+<DataSet timestep="2.2463e-170" group="" part="0" file="swe1d_3.vtr"/> 
+<DataSet timestep="2.99507e-170" group="" part="0" file="swe1d_4.vtr"/> 
+<DataSet timestep="3.74384e-170" group="" part="0" file="swe1d_5.vtr"/> 
+<DataSet timestep="4.4926e-170" group="" part="0" file="swe1d_6.vtr"/> 
+<DataSet timestep="5.24137e-170" group="" part="0" file="swe1d_7.vtr"/> 
+<DataSet timestep="5.99014e-170" group="" part="0" file="swe1d_8.vtr"/> 
+<DataSet timestep="6.7389e-170" group="" part="0" file="swe1d_9.vtr"/> 
+<DataSet timestep="7.48767e-170" group="" part="0" file="swe1d_10.vtr"/> 
+<DataSet timestep="8.23644e-170" group="" part="0" file="swe1d_11.vtr"/> 
+<DataSet timestep="8.98521e-170" group="" part="0" file="swe1d_12.vtr"/> 
+<DataSet timestep="9.73397e-170" group="" part="0" file="swe1d_13.vtr"/> 
+<DataSet timestep="1.04827e-160" group="" part="0" file="swe1d_14.vtr"/> 
+<DataSet timestep="1.12315e-160" group="" part="0" file="swe1d_15.vtr"/> 
+<DataSet timestep="1.19803e-160" group="" part="0" file="swe1d_16.vtr"/> 
+<DataSet timestep="1.2729e-160" group="" part="0" file="swe1d_17.vtr"/> 
+<DataSet timestep="1.34778e-160" group="" part="0" file="swe1d_18.vtr"/> 
+<DataSet timestep="1.42266e-160" group="" part="0" file="swe1d_19.vtr"/> 
+<DataSet timestep="1.49753e-160" group="" part="0" file="swe1d_20.vtr"/> 
+</Collection>
+</VTKFile>

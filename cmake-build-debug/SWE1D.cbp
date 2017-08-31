@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="SWE1D"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="SWE1D">
+				<Option output="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/SWE1D" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/src/tools"/>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/src/writer"/>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 SWE1D"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="SWE1D/fast">
+				<Option output="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/SWE1D" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/src/tools"/>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/src/writer"/>
+					<Add directory="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 SWE1D/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/lisa/Bachelorarbeit/SWE1D/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.cpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/main.cpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/scenarios/dambreak.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/tools/args.cpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/tools/args.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/tools/logger.cpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/tools/logger.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/types.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/writer/ConsoleWriter.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/writer/VtkWriter.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/AugRie.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/AugRieGeoClaw.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/FWave.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/FWaveCuda.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/FWaveVec.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/Hybrid.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/submodules/solvers/src/solver/WavePropagation.hpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

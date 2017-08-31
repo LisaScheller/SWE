@@ -63,6 +63,50 @@ T WavePropagation::computeNumericalFluxes()
 	return maxTimeStep;
 }
 
+T WavePropagation::computeUnstableOrLaxFriedrichsFlux() {
+	float maxWaveSpeed = 0.f;
+	//Loop over all edges
+	for (unsigned int i = 1; i<m_size+2; i++){
+		T maxEdgeSpeed;
+
+		// Compute net updates (1-dim SWE, Leveque S. 255)
+        m_hNetUpdatesRight[i] = m_hu[i+1];
+        m_huNetUpdatesRight[i] = (m_hu[i+1]*m_hu[i+1])/m_h[i+1]+(0.5f*9.81*(m_h[i+1]*m_h[i+1]));
+        m_hNetUpdatesLeft[i] = m_hu[i-1];
+        m_huNetUpdatesLeft[i] = (m_hu[i-1]*m_hu[i-1])/m_h[i-1]+(0.5f*9.81*(m_h[i-1]*m_h[i-1]));
+        //Compute edge speed
+        //TODO compute edge speed
+        //Probably use the fact that waves travel at v1 = u_0 + sqrt(g*h_0) and v2 = u_0 - sqrt(g*h_0)
+
+		// Update maxWaveSpeed
+		if (maxEdgeSpeed > maxWaveSpeed)
+			maxWaveSpeed = maxEdgeSpeed;
+	}
+	// Compute CFL condition
+    //TODO Evaluate if this is still the correct way for unstable/Lax Friedrichs
+	T maxTimeStep = m_cellSize/maxWaveSpeed * .4f;
+
+	return maxTimeStep;
+}
+
+void WavePropagation::updateUnknownsUnstable(T dt){
+    //Loop over all inner cells
+    //Leveque S. 71
+    for(unsigned int i = 1; i < m_size+1; i++){
+        m_h[i] += dt/2*m_cellSize*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]);
+        m_hu[i] += dt/2*m_cellSize*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]);
+    }
+}
+
+void WavePropagation::updateUnknownsLaxFriedrichs(T dt){
+    //Loop over all inner cells
+    //Leveque S. 71
+    for (unsigned int i = 1; i < m_size+1; i++){
+        m_h[i] = ((m_h[i-1]+m_h[i+1])/2) + dt/2*m_cellSize*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]);
+        m_hu[i] = ((m_hu[i-1]+m_hu[i+1])/2) + dt/2*m_cellSize*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]);
+    }
+}
+
 void WavePropagation::updateUnknowns(T dt)
 {
 	// Loop over all inner cells

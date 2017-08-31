@@ -37,7 +37,7 @@
 #ifndef VTKWRITER_H_
 #define VTKWRITER_H_
 
-#include "types.h"
+#include "../types.h"
 
 #include <cassert>
 #include <fstream>

@@ -86,10 +86,13 @@ int main(int argc, char** argv)
 		wavePropagation.setOutflowBoundaryConditions();
 
 		// Compute numerical flux on each edge
-		T maxTimeStep = wavePropagation.computeNumericalFluxes();
+		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
+        T maxTimeStep = wavePropagation.computeUnstableOrLaxFriedrichsFlux();
 
-		// Update unknowns from net updates
-		wavePropagation.updateUnknowns(maxTimeStep);
+		// Update unknowns from net updates (Choose between unstable and Lax Friedrichs)
+		//wavePropagation.updateUnknowns(maxTimeStep);
+        //wavePropagation.updateUnknownsUnstable(maxTimeStep);
+        wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
 
 		// Update time
 		t += maxTimeStep;
