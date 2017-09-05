@@ -38,6 +38,7 @@
 #define WAVEPROPAGATION_H_
 
 #include "types.h"
+#include "LaxFriedrichsSolver.h"
 
 // Include the solver that is currently used
 #define SUPPRESS_SOLVER_DEBUG_OUTPUT
@@ -79,6 +80,7 @@ private:
 	T *m_hNetUpdatesLeft;
 	T *m_hNetUpdatesRight;
 
+
 	T *m_huNetUpdatesLeft;
 	T *m_huNetUpdatesRight;
 
@@ -86,25 +88,30 @@ private:
 
 	T m_cellSize;
 
-	/** The solver used in computeNumericalFluxes */
-	solver::FWave<T> m_solver;
+    double g = 9.80665;
+    LaxFriedrichsSolver solver;
 
-public:
+	/** The solver used in computeNumericalFluxes */
+	//solver::FWave<T> m_solver;
+
 	/**
 	 * @param size Domain size (= number of cells) without ghost cells
 	 * @param cellSize Size of one cell
 	 */
-	WavePropagation(T *h, T *hu, unsigned int size, T cellSize)
+public:
+    WavePropagation(T *h, T *hu, unsigned int size, T cellSize)
 		: m_h(h),
 		  m_hu(hu),
 		  m_size(size),
-		  m_cellSize(cellSize)
+		  m_cellSize(cellSize),
+          solver (h, hu, size, cellSize)
 	{
 		// Allocate net updates
 		m_hNetUpdatesLeft = new T[size+1];
 		m_hNetUpdatesRight = new T[size+1];
 		m_huNetUpdatesLeft = new T[size+1];
 		m_huNetUpdatesRight = new T[size+1];
+
 	}
 
 	~WavePropagation()
@@ -114,6 +121,7 @@ public:
 		delete [] m_hNetUpdatesRight;
 		delete [] m_huNetUpdatesLeft;
 		delete [] m_huNetUpdatesRight;
+
 	}
 
 	/**
@@ -123,7 +131,7 @@ public:
 	 */
 	T computeNumericalFluxes();
 
-	T computeUnstableOrLaxFriedrichsFlux();
+	T computeLaxFriedrichsFlux(T t);
 
 
 

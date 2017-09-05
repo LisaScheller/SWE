@@ -40,6 +40,7 @@
 //#include "writer/ConsoleWriter.h"
 #include "writer/VtkWriter.h"
 #include "tools/args.h"
+#include "scenarios/gaussian.h"
 
 #include <cstring>
 
@@ -48,8 +49,9 @@ int main(int argc, char** argv)
 	// Parse command line parameters
 	tools::Args args(argc, argv);
 
-	// Scenario
+	// Scenario (Choose between Dambreak and gaussian)
 	scenarios::DamBreak scenario(args.size());
+    //scenarios::Gaussian scenario(args.size());
 
 	// Allocate memory
 	// Water height
@@ -87,7 +89,7 @@ int main(int argc, char** argv)
 
 		// Compute numerical flux on each edge
 		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
-        T maxTimeStep = wavePropagation.computeUnstableOrLaxFriedrichsFlux();
+        T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
 
 		// Update unknowns from net updates (Choose between unstable and Lax Friedrichs)
 		//wavePropagation.updateUnknowns(maxTimeStep);
