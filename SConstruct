@@ -55,7 +55,7 @@ import os
 env = Environment()
 
 # eclipse specific flag
-env.Append(CCFLAGS=['-fmessage-length=0'])
+env.Append(CCFLAGS=['-fmessage-length=0','-std=c++11'])
 
 # Add source directory to include path (important for subdirectories)
 env.Append(CPPPATH=['.'])

@@ -6,6 +6,9 @@
 #include "types.h"
 #include "LaxFriedrichsSolver.h"
 #include "WavePropagation.h"
+#include "cmath"
+#include "algorithm"
+
 T tPrev = 0;
 T LaxFriedrichsSolver::computeLaxFriedrichsFlux() {
     float maxWaveSpeed = 0.f;

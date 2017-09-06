@@ -42,7 +42,7 @@
 
 // Include the solver that is currently used
 #define SUPPRESS_SOLVER_DEBUG_OUTPUT
-#include "solvers/FWave.hpp"
+//#include "solvers/FWave.hpp"
 
 /**
  * Allocated variables:
