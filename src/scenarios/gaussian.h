@@ -39,8 +39,9 @@ namespace scenarios
             int x0 = m_size/2;
             int x = pos - x0;
             double h = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma));
-            //TODO Find correct factor for multiplication with h so that there are neither absurd oscillations nor no effect is visible
-            return 20.0f*h;
+            //Observation: With this height distribution a left-going and a right-going wave can be observed
+            //But: Height of starting wave is relatively big in comparison to water depth
+            return 10.0f*h + 0.1f;
         }
 
         /**

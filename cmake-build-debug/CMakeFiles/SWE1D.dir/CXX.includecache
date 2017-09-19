@@ -6,13 +6,33 @@
 
 #IncludeRegexTransform: 
 
+/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.cpp
+types.h
+/home/lisa/Bachelorarbeit/SWE1D/src/types.h
+LaxFriedrichsSolver.h
+/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.h
+WavePropagation.h
+/home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.h
+
+/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.h
+types.h
+/home/lisa/Bachelorarbeit/SWE1D/src/types.h
+
 /home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.cpp
 WavePropagation.h
 /home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.h
+LaxFriedrichsSolver.h
+/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.h
+algorithm
+-
+cmath
+-
 
 /home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.h
 types.h
 /home/lisa/Bachelorarbeit/SWE1D/src/types.h
+LaxFriedrichsSolver.h
+/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.h
 solvers/FWave.hpp
 /home/lisa/Bachelorarbeit/SWE1D/src/solvers/FWave.hpp
 
@@ -27,12 +47,22 @@ writer/VtkWriter.h
 /home/lisa/Bachelorarbeit/SWE1D/src/writer/VtkWriter.h
 tools/args.h
 /home/lisa/Bachelorarbeit/SWE1D/src/tools/args.h
+scenarios/gaussian.h
+/home/lisa/Bachelorarbeit/SWE1D/src/scenarios/gaussian.h
 cstring
 -
 
 /home/lisa/Bachelorarbeit/SWE1D/src/scenarios/dambreak.h
 ../types.h
 /home/lisa/Bachelorarbeit/SWE1D/src/types.h
+
+/home/lisa/Bachelorarbeit/SWE1D/src/scenarios/gaussian.h
+../types.h
+/home/lisa/Bachelorarbeit/SWE1D/src/types.h
+algorithm
+-
+cmath
+-
 
 /home/lisa/Bachelorarbeit/SWE1D/src/solvers/FWave.hpp
 cassert

@@ -52,7 +52,7 @@ print ''
 import os
 
 # Scons environement
-env = Environment()
+env = Environment(CXXFLAGS="-std=c++11")
 
 # eclipse specific flag
 env.Append(CCFLAGS=['-fmessage-length=0'])

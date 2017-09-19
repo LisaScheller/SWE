@@ -44,7 +44,7 @@ def allInDir(dir, files):
     return map(lambda f : os.path.join(dir, f), files)
 
 # List of all source files
-sourceFiles = ['main.cpp', 'WavePropagation.cpp']
+sourceFiles = ['main.cpp', 'WavePropagation.cpp', 'LaxFriedrichsSolver.cpp']
 sourceFiles += allInDir('tools', ['args.cpp', 'logger.cpp'])
 
 # Add source files to scons env
