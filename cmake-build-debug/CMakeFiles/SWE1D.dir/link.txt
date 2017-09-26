@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/SWE1D.dir/src/tools/args.cpp.o CMakeFiles/SWE1D.dir/src/tools/logger.cpp.o CMakeFiles/SWE1D.dir/src/main.cpp.o CMakeFiles/SWE1D.dir/src/WavePropagation.cpp.o  -o SWE1D 
+/usr/bin/c++  -g   CMakeFiles/SWE1D.dir/src/tools/args.cpp.o CMakeFiles/SWE1D.dir/src/tools/logger.cpp.o CMakeFiles/SWE1D.dir/src/main.cpp.o CMakeFiles/SWE1D.dir/src/WavePropagation.cpp.o CMakeFiles/SWE1D.dir/src/LaxFriedrichsSolver.cpp.o  -o SWE1D 

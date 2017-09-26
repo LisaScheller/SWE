@@ -90,6 +90,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.cpp">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/LaxFriedrichsSolver.h">
+			<Option target="SWE1D"/>
+		</Unit>
 		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/WavePropagation.cpp">
 			<Option target="SWE1D"/>
 		</Unit>
@@ -100,6 +106,9 @@
 			<Option target="SWE1D"/>
 		</Unit>
 		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/scenarios/dambreak.h">
+			<Option target="SWE1D"/>
+		</Unit>
+		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/scenarios/gaussian.h">
 			<Option target="SWE1D"/>
 		</Unit>
 		<Unit filename="/home/lisa/Bachelorarbeit/SWE1D/src/tools/args.cpp">

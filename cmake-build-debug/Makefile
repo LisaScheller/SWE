@@ -123,6 +123,33 @@ SWE1D/fast:
 	$(MAKE) -f CMakeFiles/SWE1D.dir/build.make CMakeFiles/SWE1D.dir/build
 .PHONY : SWE1D/fast
 
+src/LaxFriedrichsSolver.o: src/LaxFriedrichsSolver.cpp.o
+
+.PHONY : src/LaxFriedrichsSolver.o
+
+# target to build an object file
+src/LaxFriedrichsSolver.cpp.o:
+	$(MAKE) -f CMakeFiles/SWE1D.dir/build.make CMakeFiles/SWE1D.dir/src/LaxFriedrichsSolver.cpp.o
+.PHONY : src/LaxFriedrichsSolver.cpp.o
+
+src/LaxFriedrichsSolver.i: src/LaxFriedrichsSolver.cpp.i
+
+.PHONY : src/LaxFriedrichsSolver.i
+
+# target to preprocess a source file
+src/LaxFriedrichsSolver.cpp.i:
+	$(MAKE) -f CMakeFiles/SWE1D.dir/build.make CMakeFiles/SWE1D.dir/src/LaxFriedrichsSolver.cpp.i
+.PHONY : src/LaxFriedrichsSolver.cpp.i
+
+src/LaxFriedrichsSolver.s: src/LaxFriedrichsSolver.cpp.s
+
+.PHONY : src/LaxFriedrichsSolver.s
+
+# target to generate assembly for a file
+src/LaxFriedrichsSolver.cpp.s:
+	$(MAKE) -f CMakeFiles/SWE1D.dir/build.make CMakeFiles/SWE1D.dir/src/LaxFriedrichsSolver.cpp.s
+.PHONY : src/LaxFriedrichsSolver.cpp.s
+
 src/WavePropagation.o: src/WavePropagation.cpp.o
 
 .PHONY : src/WavePropagation.o
@@ -240,6 +267,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... SWE1D"
+	@echo "... src/LaxFriedrichsSolver.o"
+	@echo "... src/LaxFriedrichsSolver.i"
+	@echo "... src/LaxFriedrichsSolver.s"
 	@echo "... src/WavePropagation.o"
 	@echo "... src/WavePropagation.i"
 	@echo "... src/WavePropagation.s"

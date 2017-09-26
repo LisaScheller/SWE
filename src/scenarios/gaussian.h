@@ -34,13 +34,14 @@ namespace scenarios
             //Maximum (height 1) at m_size/2
 
             //Standard deviation
-            double sigma = 50.0/3.0;
+            double sigma = 10.0/3.0;
             //Get relative position in relation to m_size/2
             int x0 = m_size/2;
             int x = pos - x0;
-            double h = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma));
-            //TODO Find correct factor for multiplication with h so that there are neither absurd oscillations nor no effect is visible
-            return 20.0f*h;
+            double h = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma))*0.01;
+            //Observation: With this height distribution a left-going and a right-going wave can be observed
+            //But: Height of starting wave is relatively big in comparison to water depth
+            return 10.0f*h + 0.1f;
         }
 
         /**

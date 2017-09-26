@@ -22,7 +22,7 @@ set(SOURCE_FILES
         submodules/solvers/src/solver/FWaveVec.hpp
         submodules/solvers/src/solver/Hybrid.hpp
         submodules/solvers/src/solver/WavePropagation.hpp
-        )
+        src/scenarios/gaussian.h src/LaxFriedrichsSolver.cpp src/LaxFriedrichsSolver.h)
 
 include_directories(src/tools src/writer submodules/solvers/src/solver)
 

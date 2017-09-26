@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 
 	// Scenario (Choose between Dambreak and gaussian)
 	scenarios::DamBreak scenario(args.size());
-    //scenarios::Gaussian scenario(args.size());
+	//scenarios::Gaussian scenario(args.size());
 
 	// Allocate memory
 	// Water height
@@ -76,6 +76,8 @@ int main(int argc, char** argv)
 
 	// Current time of simulation
 	T t = 0;
+
+
 
 	writer.write(t, h, hu, args.size());
 

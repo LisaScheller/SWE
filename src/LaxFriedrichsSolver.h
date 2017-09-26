@@ -54,8 +54,12 @@ public:
     T computeLaxFriedrichsFlux2(T t);
 
     void updateUnknownsLaxFriedrichs(T dt);
-    void updateUnknowsLaxFriedrichs2(T dt);
+    void updateUnknownsLaxFriedrichs2(T dt);
     void updateUnknownsLaxFriedrichsDirect(T dt);
+
+    T computeLocalLaxFriedrichsFlux(T t);
+
+    void updateUnknownsLocalLaxFriedrichs(T dt);
 };
 
 #endif //SWE1D_LAXFRIEDRICHSSOLVER_H
