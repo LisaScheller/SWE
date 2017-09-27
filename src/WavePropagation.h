@@ -89,9 +89,8 @@ private:
 	T m_cellSize;
 
     double g = 9.80665;
-    LaxFriedrichsSolver solver;
 
-	/** The solver used in computeNumericalFluxes */
+    /** The solver used in computeNumericalFluxes */
 	//solver::FWave<T> m_solver;
 
 	/**
@@ -151,6 +150,10 @@ public:
     void updateUnknownsUnstable(T dt);
 
     void updateUnknownsLaxFriedrichs(T dt);
+
+    T computeError();
+
+    LaxFriedrichsSolver solver;
 };
 
 

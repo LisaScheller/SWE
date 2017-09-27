@@ -86,6 +86,7 @@ void WavePropagation::updateUnknownsLaxFriedrichs(T dt){
     //solver.updateUnknownsLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichsDirect(dt);
     solver.updateUnknownsLaxFriedrichs2(dt);
+    solver.solveAnalytically(dt);
 
 }
 
@@ -102,4 +103,12 @@ void WavePropagation::setOutflowBoundaryConditions()
 {
 	m_h[0] = m_h[1]; m_h[m_size+1] = m_h[m_size];
 	m_hu[0] = m_hu[1]; m_hu[m_size+1] = m_hu[m_size];
+}
+
+T WavePropagation::computeError() {
+    T res = 0.0f;
+    for (int i = 0; i<m_size+1; i++){
+        res += sqrtf((std::abs(m_h[i]-solver.a_h[i])*std::abs(m_h[i]-solver.a_h[i]))+(std::abs(m_hu[i]-solver.a_hu[i])*std::abs(m_hu[i]-solver.a_hu[i])));
+    }
+    return res;
 }

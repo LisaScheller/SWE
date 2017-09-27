@@ -24,6 +24,8 @@ private:
 
     static constexpr double g = 9.80665;
 public:
+    T *a_h;
+    T *a_hu;
     LaxFriedrichsSolver(T *h, T *hu, unsigned int size, T cellSize)
     : m_h(h),
     m_hu(hu),
@@ -35,6 +37,8 @@ public:
         m_hNetUpdatesRight = new T[size+1];
         m_huNetUpdatesLeft = new T[size+1];
         m_huNetUpdatesRight = new T[size+1];
+        a_h = new T[size+1];
+        a_hu = new T[size+1];
 
     }
 
@@ -60,6 +64,10 @@ public:
     T computeLocalLaxFriedrichsFlux(T t);
 
     void updateUnknownsLocalLaxFriedrichs(T dt);
+
+    void solveAnalytically(T dt);
+
+
 };
 
 #endif //SWE1D_LAXFRIEDRICHSSOLVER_H

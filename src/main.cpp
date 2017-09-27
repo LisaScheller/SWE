@@ -81,6 +81,8 @@ int main(int argc, char** argv)
 
 	writer.write(t, h, hu, args.size());
 
+    T error = 0;
+
 	for (unsigned int i = 0; i < args.timeSteps(); i++) {
 		// Do one time step
 		tools::Logger::logger << "Computing timestep " << i
@@ -98,16 +100,31 @@ int main(int argc, char** argv)
         //wavePropagation.updateUnknownsUnstable(maxTimeStep);
         wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
 
+        //Compute difference between exact solution and numerical method at t=2,5
+        if(i==75){
+             error = wavePropagation.computeError();
+            writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
+            analyticalWriter.write(t, wavePropagation.solver.a_h, wavePropagation.solver.a_hu, args.size());
+        }
+
 		// Update time
 		t += maxTimeStep;
 
 		// Write new values
 		writer.write(t, h, hu, args.size());
+
+
+
 	}
+
 
 	// Free allocated memory
 	delete [] h;
 	delete [] hu;
 
+
+    std::cout << "Error at time approx. 2.5 is " << error
+              <<  std::endl;
 	return 0;
+
 }

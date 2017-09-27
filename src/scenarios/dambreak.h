@@ -48,10 +48,10 @@ private:
 	/** Number of cells */
 	const unsigned int m_size;
 
+
 public:
 	DamBreak(unsigned int size)
-		: m_size(size)
-	{
+		: m_size(size) {
 	}
 
 	/**
@@ -70,7 +70,7 @@ public:
 	 */
 	T getCellSize()
 	{
-		return 100.f / m_size;
+		return 100.0f / m_size;
 	}
 };
 

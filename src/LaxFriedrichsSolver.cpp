@@ -155,6 +155,45 @@ void LaxFriedrichsSolver::updateUnknownsLocalLaxFriedrichs(T dt){
     }
 }
 
+void LaxFriedrichsSolver::solveAnalytically(T dt){
+    /*float c_m1 = -4.0967;
+    float c_m2 = -1.52075;
+    float c_m3 = 1.06967;
+    float c_m4 = 32.4576;*/
+    T c_m1 = -15.4767;
+    T c_m2 = 37.2606;
+    float c_m = c_m1;
+    float h_l = 11.0f;
+    float h_r = 10.0f;
+    float x0 = m_size/2.0f;
+    T t = tPrev +dt;
+    T xA = x0 - (t*sqrtf(g*h_l));
+    T xB = x0 + (t*((2.0f*sqrtf(g*h_l))-(3.0f*c_m)));
+    T xC = x0 + (t*((2.0f*c_m*c_m)*(sqrtf(g*h_l)-c_m))/(c_m*c_m-(g*h_r)));
+    for (unsigned int i =1; i<m_size; i++){
+        float x = (i+(i+1)/2); //oder i+(i+1)/2?
+        //get h and hu
+        if (x<=xA){
+            a_h[i] = h_l;
+            a_hu[i] = a_h[i]*0.0f;
+        }
+        else if (x>xA && x <= xB){
+            a_h[i] = (4.0f/9.0f*g)*(sqrtf(g*h_l)-((x-x0)/2.0f*t))*(sqrtf(g*h_l)-((x-x0)/2.0f*t));
+            a_hu[i] = a_h[i]*(2.0f/3.0f*(((x-x0)/t)+sqrtf(g*h_l)));
+        }
+        else if (x>xB && x <= xC){
+            a_h[i] = (c_m*c_m)/g;
+            a_hu[i] = a_h[i]*(2.0f*(sqrtf(g*h_l)-c_m));
+        }
+        else {
+            a_h[i] = h_r;
+            a_hu[i] = a_h[i]*0;
+        }
+    }
+
+}
+
+
 void LaxFriedrichsSolver::updateUnknownsLaxFriedrichsDirect(T dt){
     //Alternative method that computes h and hu directly using formula 4.20 (Leveque p.71)
     //without needing an extra method for calculating the fluxes
@@ -168,4 +207,6 @@ void LaxFriedrichsSolver::updateUnknownsLaxFriedrichsDirect(T dt){
     }
 
 }
+
+
 
