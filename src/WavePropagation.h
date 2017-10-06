@@ -98,12 +98,12 @@ private:
 	 * @param cellSize Size of one cell
 	 */
 public:
-    WavePropagation(T *h, T *hu, unsigned int size, T cellSize)
+    WavePropagation(T *h, T *hu, T *ah, T *ahu, unsigned int size, T cellSize)
 		: m_h(h),
 		  m_hu(hu),
 		  m_size(size),
 		  m_cellSize(cellSize),
-          solver (h, hu, size, cellSize)
+          solver (h, hu, ah, ahu, size, cellSize)
 	{
 		// Allocate net updates
 		m_hNetUpdatesLeft = new T[size+1];
@@ -154,6 +154,8 @@ public:
     T computeError();
 
     LaxFriedrichsSolver solver;
+
+    T computeErrorHU();
 };
 
 

@@ -39,7 +39,7 @@
 
 
 // Switch precision here
-typedef float T;
-//typedef double T;
+//typedef float T;
+typedef double T;
 
 #endif /* TYPES_H_ */

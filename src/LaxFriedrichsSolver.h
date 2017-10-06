@@ -26,9 +26,11 @@ private:
 public:
     T *a_h;
     T *a_hu;
-    LaxFriedrichsSolver(T *h, T *hu, unsigned int size, T cellSize)
+    LaxFriedrichsSolver(T *h, T *hu, T *ah, T *ahu, unsigned int size, T cellSize)
     : m_h(h),
     m_hu(hu),
+    a_h(ah),
+    a_hu(ahu),
     m_size(size),
     m_cellSize(cellSize)
     {
@@ -37,8 +39,7 @@ public:
         m_hNetUpdatesRight = new T[size+1];
         m_huNetUpdatesLeft = new T[size+1];
         m_huNetUpdatesRight = new T[size+1];
-        a_h = new T[size+1];
-        a_hu = new T[size+1];
+
 
     }
 

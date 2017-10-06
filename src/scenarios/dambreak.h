@@ -70,7 +70,7 @@ public:
 	 */
 	T getCellSize()
 	{
-		return 100.0f / m_size;
+		return 100.0 / m_size;
 	}
 };
 

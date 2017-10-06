@@ -126,7 +126,7 @@ public:
 		        	<< " 0 0 0 0\">" << std::endl;
 
 		vtkFile << "<Coordinates>" << std::endl
-			<< "<DataArray type=\"Float32\" format=\"ascii\">" << std::endl;
+			<< "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl;
 
 		// grid points
 		for (int i=0; i < size+1; i++)
@@ -134,11 +134,11 @@ public:
 
 		vtkFile << "</DataArray>" << std::endl;
 
-		vtkFile	<< "<DataArray type=\"Float32\" format=\"ascii\">" << std::endl
+		vtkFile	<< "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl
 				<< "0" << std::endl
 				<< "</DataArray>" << std::endl;
 
-		vtkFile	<< "<DataArray type=\"Float32\" format=\"ascii\">" << std::endl
+		vtkFile	<< "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl
 				<< "0" << std::endl
 				<< "</DataArray>" << std::endl;
 
@@ -147,13 +147,13 @@ public:
 		vtkFile << "<CellData>" << std::endl;
 
 		// water surface height
-		vtkFile << "<DataArray Name=\"h\" type=\"Float32\" format=\"ascii\">" << std::endl;
+		vtkFile << "<DataArray Name=\"h\" type=\"Float64\" format=\"ascii\">" << std::endl;
 		for (int i=1; i < size+1; i++)
 				vtkFile << h[i] << std::endl;
 		vtkFile << "</DataArray>" << std::endl;
 
 		// momentum
-		vtkFile << "<DataArray Name=\"hu\" type=\"Float32\" format=\"ascii\">" << std::endl;
+		vtkFile << "<DataArray Name=\"hu\" type=\"Float64\" format=\"ascii\">" << std::endl;
 		for (int i=1; i < size+1; i++)
 			vtkFile << hu[i] << std::endl;
 		vtkFile << "</DataArray>" << std::endl;
