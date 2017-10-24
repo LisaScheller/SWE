@@ -108,9 +108,11 @@ void WavePropagation::setOutflowBoundaryConditions()
 T WavePropagation::computeError() {
     T res = 0.0;
     for (int i = 0; i<m_size+1; i++){
-        res += sqrtf((std::abs(m_h[i]-solver.a_h[i])*std::abs(m_h[i]-solver.a_h[i]))+(std::abs(m_hu[i]-solver.a_hu[i])*std::abs(m_hu[i]-solver.a_hu[i])));
+        //res += sqrtf((std::abs(m_cellSize*(m_h[i]-solver.a_h[i]))*std::abs(m_cellSize*(m_h[i]-solver.a_h[i])))+(std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))*std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))));
+        res += std::abs((m_cellSize*(m_h[i]-solver.a_h[i]))*std::abs(m_cellSize*(m_h[i]-solver.a_h[i])))+(std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))*std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i])));
+        //res += std::abs(m_cellSize*(m_h[i]-solver.a_h[i]))+std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]));
     }
-    return res;
+    return sqrt(res);
 }
 
 

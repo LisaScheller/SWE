@@ -172,7 +172,7 @@ void LaxFriedrichsSolver::solveAnalytically(T dt){
     T lambda_1_m=u_m-sqrt(g*h_m);
     for (unsigned int i =0; i<m_size; i++){
         //T x = i-50.0; //oder i+(i+1)/2?
-        T x = (((i+(i+1))/2)/1)-50.0;
+        T x = (((i+(i+1))/2)/4)-50.0;
         if(x/t<=lambda_1_l){
             a_h[i]=h_l;
             a_hu[i]=a_h[i]*u_l;
