@@ -15,6 +15,8 @@ set(SOURCE_FILES
         src/types.h
         src/WavePropagation.cpp
         src/WavePropagation.h
+        src/NodalAdvection.cpp
+        src/NodalAdvection.h
         submodules/solvers/src/solver/AugRie.hpp
         submodules/solvers/src/solver/AugRieGeoClaw.hpp
         submodules/solvers/src/solver/FWave.hpp
