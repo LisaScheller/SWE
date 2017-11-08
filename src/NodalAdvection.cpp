@@ -3,9 +3,11 @@
 //
 
 #include <cmath>
+#include <algorithm>
 #include "types.h"
 #include "NodalAdvection.h"
-int N = NodalAdvection::N;
+
+
 T* matmult(T* a, T* b, int n, int l, int m){
     //TODO implement algorithm for multiplication of sparse matrices
     //Mutliplication of Matrix A (nxm), Matrix b(mxl)
@@ -20,7 +22,7 @@ T* matmult(T* a, T* b, int n, int l, int m){
     return res;
 }
 
-//Compute Jacobi Polynomial of order n at value x
+/*//Compute Jacobi Polynomial of order n at value x
 T JacobiP(T x, T alpha, T beta, int n){
     T res = 0;
     if(n==0){
@@ -55,88 +57,73 @@ T* gradJacobiP(T* r, T alpha, T beta){
         }
     }
     return res;
-}
+}*/
 
-T* vandermonde1D(T*r){
-    //Compute the Vandermonde Matrix, dimension lenght(r)*N+1
-    T *V1D = new T[r.length*(N+1)];
-    for(int j = 1; j<=N+1; j++){
-        //TODO Find correct index of r
-        V1D[2*j-2] = JacobiP(r[2*j-2],0,0,j-1);
-        V1D[2*j-1] = JacobiP(r[2*j-1],0,0,j-1);
+//Solve standard 1D advection equation u_t + a*u_x = 0
+//Time derivative u_t = inv_m*(s*a*deltax*u+no*netUpdatesRight*deltax-n1*netUpdatesLeft*deltax)
+//Euler step u_n+1 = u_n + deltat*u_t(t_n, u_n)
+//CFL-Condition deltat = deltax/(a*3)
+
+T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
+    T maxWaveSpeed = 0.f;
+    T deltaT = t - t0;
+    t0 = t;
+    //Loop over all intervalls
+    for(unsigned int i = 0; i<m_size+2; i++){
+        //Factor a for local Lax Friedrichs Method (aLeft = a_i-1/2, aRight = a_i+1/2
+        T aLeft;
+        T aRight;
+
+        //Eigenvalue lambda = a
+        aLeft  = std::abs(a);
+        aRight = std::abs(a);
+
+        //Compute fluxes for u
+        m_uNetUpdatesRight[i]=0.5f*(m_u[i]+m_u[i+1]-(aRight*(m_u[i+1]-m_u[i])));
+        m_uNetUpdatesLeft[i]=0.5f*(m_u[i-1]+m_u[i]-(aLeft*(m_u[i]-m_u[i-1])));
+
+        // Update maxWaveSpeed
+        maxWaveSpeed = std::max(std::max(maxWaveSpeed,aLeft),aRight);
+
     }
-    return V1D;
+    // Compute CFL condition (delta_t = delta_x/(a*3))
 
+    T maxTimeStep = m_cellSize/(a*3);
+
+    return maxTimeStep;
 }
 
-T* gradVandermonde1D(T* r){
-    T *DVr = new T[r.length*(N+1)];
-    for(int i = 0; i<N+1; i++){
-        for(int j = 0; j<r.length; j++){
-            DVr[i*(N+1)+j]=gradJacobiP(r[i*(N+1)+j],0,0,i);
+void NodalAdvection::computeTimeDerivative(){
+    for(unsigned int i = 0; i<m_size+2; i++){
+        //Compute S *(a*delta_x*u)
+        T *rightTermFirst = new T[4];
+        for (unsigned int j = 0; j<4; j++){
+            rightTermFirst[j] = s[j]*a*m_u[i]*m_cellSize;
         }
-    }
-    return DVr;
-}
-T* DMatrix(T*r, T* V){
-    T* Vr = gradVandermonde1D(r);
-    T* Dr = new T[];
-    //TODO Compute with maple???
-    for (int i = 0; i<Vr.size; i++){
-        Dr[i] = Vr[i]/V[i];
-    }
-    return Dr;
-}
-
-T* Lift1D(){
-    T* Emat = new T[Np*(Nfaces*Nfp)];
-    Emat[1*(Nfaces*Nfp)+1]=1.0;
-    Emat[Np*(Nfaces*Nfp)+2]=1.0;
-    T* lift = new T[];
-    lift = V*(invV*Emat);
-}
-
-T* computeX(){
-    T* va = new T[K];
-    T* vb = new T[K];
-    //va first column of EToV, vb second column
-    for(int i = 0; i<K; i++){
-        va[i] = EToV[i*2+1];
-        vb[i] = EToV[i*2+2];
-    }
-    T* ones = new T[Np];
-    for (int i = 0; i<Np; i++){
-        ones[i] = 1;
-    }
-    return ones*Vx(va)+0.5*(r+1)*(VX(vb)-VX(va));
-}
-
-T* geometricFactors1D(T* x, T* Dr){
-    T *xr = Dr*x;
-    J = xr;
-    rx = 1/J;
-}
-
-T* normals1D(){
-    T* nx = new T[(Nfp*Nfaces)*K];
-    for(int i = 0; i<2; i++){
-        for (int j = 0; j<K; j++){
-            if(i==0){
-                nx[i*k+j]=-1.0;
-            }
-            else nx[i*K+j]= 1.0;
+        //Compute n0*netupdatesRight*delta_x
+        T *rightTermSecond = new T[4];
+        for(unsigned int k = 0; k<4; k++){
+            rightTermSecond[k] = n0[k]*m_uNetUpdatesRight[i]*m_cellSize;
         }
+        //Compute n1*netUpdatesLeft*delta_x
+        T *rightTermThird = new T[4];
+        for(unsigned int l = 0; l<4; l++){
+            rightTermThird[l] = n1[l]*m_uNetUpdatesLeft[i]*m_cellSize;
+        }
+        //Put right side first+second-third together
+        T *rightTerm = new T[4];
+        for(unsigned int o = 0; o<4; o++){
+            rightTerm[o] = rightTermFirst[o]+rightTermSecond[o]-rightTermThird[o];
+        }
+        m_ut[i]=matmult(inv_m,rightTerm,2,2,2);
     }
-    return nx;
 }
 
-//TODO Compute FToF and FToV
-
-T* connect1D(){
-    int NFaces = 2;
-    int K = sizeof(EToV,1);
-    int totalFaces = NFaces*K;
-    int NV = K+1;
-    T* vn = new T[1*2];
-    
+void NodalAdvection::computeEulerStep(T delta_t){
+    for(unsigned int i = 0; i<m_size+2; i++){
+        //Commentend out because of invalid operation scalar + matrix
+        //m_u[i]=m_u[i]+(delta_t*m_ut[i]);
+    }
 }
+
+

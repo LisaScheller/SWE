@@ -66,9 +66,9 @@
  }*/
 
 T WavePropagation::computeLaxFriedrichsFlux(T t) {
-  //return solver.computeLocalLaxFriedrichsFlux(t);
+  return solver.computeLocalLaxFriedrichsFlux(t);
      //return solver.computeLaxFriedrichsFlux();
-     return solver.computeLaxFriedrichsFlux2(t);
+     //return solver.computeLaxFriedrichsFlux2(t);
 
 }
 
@@ -82,10 +82,10 @@ void WavePropagation::updateUnknownsUnstable(T dt){
 }
 
 void WavePropagation::updateUnknownsLaxFriedrichs(T dt){
-  //solver.updateUnknownsLocalLaxFriedrichs(dt);
+  solver.updateUnknownsLocalLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichsDirect(dt);
-    solver.updateUnknownsLaxFriedrichs2(dt);
+    //solver.updateUnknownsLaxFriedrichs2(dt);
     solver.solveAnalytically(dt);
 
 }

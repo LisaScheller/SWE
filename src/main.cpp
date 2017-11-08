@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 {
 	// Parse command line parameters
 	tools::Args args(argc, argv);
-    int factor = 4;
+    int factor = 1;
     int numberOfIntervals = (factor*args.size());
 
 
@@ -128,12 +128,12 @@ int main(int argc, char** argv)
 	//writer::ConsoleWriter writer;
 	writer::VtkWriter writer("swe1d", scenario.getCellSize());
     writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
-    writer::VtkWriter nodalAdvectionWriter("nodaladvection", 1);
+    //writer::VtkWriter nodalAdvectionWriter("nodaladvection", 1);
 
 	// Helper class computing the wave propagation
 	WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
     //Helper class for compution the solution of advection equation using nodal DG
-    NodalAdvection nodalAdvection();
+    //NodalAdvection nodalAdvection(0.25f,h,numberOfIntervals,scenario.getCellSize());
 
 	// Write initial data
 	tools::Logger::logger.info("Initial data");
@@ -158,24 +158,25 @@ int main(int argc, char** argv)
 
 		// Update boundaries
 		wavePropagation.setOutflowBoundaryConditions();
-        nodalAdvection.setBoundaryConditions();
+        //nodalAdvection.setBoundaryConditions();
 
 		// Compute numerical flux on each edge
 		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
         T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
-        T advTimeStep = nodalAdvection.compute(t);
+        //T advTimeStep = nodalAdvection.computeLocalLaxFriedrichsFluxes(t);
+        //nodalAdvection.computeTimeDerivative();
 
 		// Update unknowns from net updates (Choose between unstable and Lax Friedrichs)
 		//wavePropagation.updateUnknowns(maxTimeStep);
         //wavePropagation.updateUnknownsUnstable(maxTimeStep);
         wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
-        nodalAdvection.updateUnknowns(advTimeStep);
+        //nodalAdvection.computeEulerStep(advTimeStep);
 
 
 
 		// Update time
-		//t += maxTimeStep;
-        t += advTimeStep;
+		t += maxTimeStep;
+        //t += advTimeStep;
 
         h_num[0]=h[0];
         hu_num[0]=hu[0];
@@ -237,7 +238,7 @@ int main(int argc, char** argv)
         writer.write(t, h_num, hu_num, numberOfIntervals / factor);
         //analyticalWriter.write(t, ah, ahu, numberOfIntervals/2);
         analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
-        nodalAdvectionWriter.write();
+        //nodalAdvectionWriter.write();
 
 
 	}

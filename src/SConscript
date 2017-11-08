@@ -45,7 +45,7 @@ def allInDir(dir, files):
 
 # List of all source files
 
-sourceFiles = ['main.cpp', 'WavePropagation.cpp', 'LaxFriedrichsSolver.cpp']
+sourceFiles = ['main.cpp', 'WavePropagation.cpp', 'LaxFriedrichsSolver.cpp', 'NodalAdvection.cpp']
 
 sourceFiles += allInDir('tools', ['args.cpp', 'logger.cpp'])
 
