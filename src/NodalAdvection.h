@@ -19,7 +19,7 @@ private:
     T *n0;
     //Second N-Matrix
     T *n1;
-
+    // m_u[nElements + 2][2]
     T *m_u;
     T *m_uNetUpdatesLeft;
     T *m_uNetUpdatesRight;
