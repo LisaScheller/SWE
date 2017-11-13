@@ -11,6 +11,7 @@
 T* matmult(T* a, T* b, int n, int l, int m){
     //TODO implement algorithm for multiplication of sparse matrices
     //Mutliplication of Matrix A (nxm), Matrix b(mxl)
+    //fill with zeros
     T* res = new T[n*l];
     for(int i = 0; i<n; i++){
         for(int k = 0; k<l; k++){
@@ -79,7 +80,9 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
         aRight = std::abs(a);
 
         //Compute fluxes for u
+        //m_u[i][1]+m_u[i+1][0] ... m_u[i][1]  -m_u[i+1][0]
         m_uNetUpdatesRight[i]=0.5f*(m_u[i]+m_u[i+1]-(aRight*(m_u[i+1]-m_u[i])));
+        //m_u[i-1][1]+m_u[i][0] ... m_u[i-1][1]-m_u[i][0]
         m_uNetUpdatesLeft[i]=0.5f*(m_u[i-1]+m_u[i]-(aLeft*(m_u[i]-m_u[i-1])));
 
         // Update maxWaveSpeed
@@ -96,23 +99,34 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
 void NodalAdvection::computeTimeDerivative(){
     for(unsigned int i = 0; i<m_size+2; i++){
         //Compute S *(a*delta_x*u)
+        //only size 2
         T *rightTermFirst = new T[4];
+        //for (unsigned int j = 0; j<2; j++){
         for (unsigned int j = 0; j<4; j++){
+            //rightTermFirst[0] = s[j]*a*m_u[i][j]*m_cellSize;
+            //rightTermFirst[1] = s[2+j]*a*m_u[i][j]*m_cellSize;
             rightTermFirst[j] = s[j]*a*m_u[i]*m_cellSize;
         }
+        //s.o.
         //Compute n0*netupdatesRight*delta_x
         T *rightTermSecond = new T[4];
         for(unsigned int k = 0; k<4; k++){
+            //s.o.
             rightTermSecond[k] = n0[k]*m_uNetUpdatesRight[i]*m_cellSize;
         }
+        //s.o.
         //Compute n1*netUpdatesLeft*delta_x
         T *rightTermThird = new T[4];
+        //s.o.
         for(unsigned int l = 0; l<4; l++){
+            //s.o.
             rightTermThird[l] = n1[l]*m_uNetUpdatesLeft[i]*m_cellSize;
         }
         //Put right side first+second-third together
+        //s.o.
         T *rightTerm = new T[4];
         for(unsigned int o = 0; o<4; o++){
+            //s.o.
             rightTerm[o] = rightTermFirst[o]+rightTermSecond[o]-rightTermThird[o];
         }
         m_ut[i]=matmult(inv_m,rightTerm,2,2,2);
