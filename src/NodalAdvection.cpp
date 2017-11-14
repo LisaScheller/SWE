@@ -94,10 +94,10 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
 
         //Compute fluxes for u
         //m_u[i][1]+m_u[i+1][0] ... m_u[i][1]  -m_u[i+1][0]
-        m_uNetUpdatesRight[i] = 0.5f*(m_u[i].u1+m_u[i+1].u0-(aRight*(m_u[i+1].u0-m_u[i].u1)));
+        m_uNetUpdatesRight[i] = 0.5f*(a*m_u[i].u1+a*m_u[i+1].u0-(aRight*(m_u[i+1].u0-m_u[i].u1)));
         //m_uNetUpdatesRight[i]=0.5f*(m_u[i]+m_u[i+1]-(aRight*(m_u[i+1]-m_u[i])));
         //m_u[i-1][1]+m_u[i][0] ... m_u[i-1][1]-m_u[i][0]
-        m_uNetUpdatesLeft[i] = 0.5f*(m_u[i-1].u1+m_u[i].u0-(aLeft*(m_u[i].u0-m_u[i-1].u1)));
+        m_uNetUpdatesLeft[i] = 0.5f*(a*m_u[i-1].u1+a*m_u[i].u0-(aLeft*(m_u[i].u0-m_u[i-1].u1)));
         //m_uNetUpdatesLeft[i]=0.5f*(m_u[i-1]+m_u[i]-(aLeft*(m_u[i]-m_u[i-1])));
 
         // Update maxWaveSpeed
