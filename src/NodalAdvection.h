@@ -20,12 +20,14 @@ private:
     //Second N-Matrix
     T *n1;
     // m_u[nElements + 2][2]
-    T *m_u;
+    //Array of left and right points of intervals
+    u *m_u;
+    //Left and right fluxes
     T *m_uNetUpdatesLeft;
     T *m_uNetUpdatesRight;
     //Time derivative of u
-    T **m_ut;
-    T m_size;
+    u *m_ut;
+    int m_size;
 
     //Time variables
     T t0 = 0.0;
@@ -34,7 +36,7 @@ private:
 
     T m_cellSize;
 public:
-    NodalAdvection(float a_def, T *h, unsigned int size, unsigned int cellsize):
+    NodalAdvection(float a_def, u *h, unsigned int size, unsigned int cellsize):
             a(a_def),
             m_size(size),
             m_u(h),
@@ -47,7 +49,8 @@ public:
                 n1 = new T[4];
                 m_uNetUpdatesLeft = new T[size+1];
                 m_uNetUpdatesRight = new T[size+1];
-                T m_ut[size+2][4];
+                m_ut = new u[m_size+2];
+
 
                 //Define entries of matrices (0=00, 1 = 01, 2 = 10, 3 = 11)
                 s[0] = -0.5f;
@@ -74,6 +77,11 @@ public:
                 n1[1] = 0.0f;
                 n1[2] = 0.0f;
                 n1[3] = 1.0f;
+
+                for (int i = 0; i<m_size+2; i++){
+                    m_ut[i].u0 = 0.0f;
+                    m_ut[i].u1 = 0.0f;
+                }
 
             }
 

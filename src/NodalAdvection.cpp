@@ -9,10 +9,13 @@
 
 
 T* matmult(T* a, T* b, int n, int l, int m){
-    //TODO implement algorithm for multiplication of sparse matrices
+
     //Mutliplication of Matrix A (nxm), Matrix b(mxl)
-    //fill with zeros
     T* res = new T[n*l];
+    //fill with zeros
+    for (int a = 0; a<n*l; a++){
+        res[a] = 0.0f;
+    }
     for(int i = 0; i<n; i++){
         for(int k = 0; k<l; k++){
             for(int j = 0; j<m; j++){
@@ -20,6 +23,16 @@ T* matmult(T* a, T* b, int n, int l, int m){
             }
         }
     }
+    return res;
+}
+
+u matVecMult(T* a,u b){
+    //Mutliplication of 2x2 Matrix with 2x1 vector
+    u res;
+    res.u0 =0;
+    res.u1 = 0;
+    res.u0 = a[0]*b.u0+a[1]*b.u1;
+    res.u1 = a[2]*b.u0+a[3]*b.u1;
     return res;
 }
 
@@ -70,7 +83,7 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
     T deltaT = t - t0;
     t0 = t;
     //Loop over all intervalls
-    for(unsigned int i = 0; i<m_size+2; i++){
+    for(unsigned int i = 1; i<m_size+2; i++){
         //Factor a for local Lax Friedrichs Method (aLeft = a_i-1/2, aRight = a_i+1/2
         T aLeft;
         T aRight;
@@ -81,9 +94,11 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
 
         //Compute fluxes for u
         //m_u[i][1]+m_u[i+1][0] ... m_u[i][1]  -m_u[i+1][0]
-        m_uNetUpdatesRight[i]=0.5f*(m_u[i]+m_u[i+1]-(aRight*(m_u[i+1]-m_u[i])));
+        m_uNetUpdatesRight[i] = 0.5f*(m_u[i].u1+m_u[i+1].u0-(aRight*(m_u[i+1].u0-m_u[i].u1)));
+        //m_uNetUpdatesRight[i]=0.5f*(m_u[i]+m_u[i+1]-(aRight*(m_u[i+1]-m_u[i])));
         //m_u[i-1][1]+m_u[i][0] ... m_u[i-1][1]-m_u[i][0]
-        m_uNetUpdatesLeft[i]=0.5f*(m_u[i-1]+m_u[i]-(aLeft*(m_u[i]-m_u[i-1])));
+        m_uNetUpdatesLeft[i] = 0.5f*(m_u[i-1].u1+m_u[i].u0-(aLeft*(m_u[i].u0-m_u[i-1].u1)));
+        //m_uNetUpdatesLeft[i]=0.5f*(m_u[i-1]+m_u[i]-(aLeft*(m_u[i]-m_u[i-1])));
 
         // Update maxWaveSpeed
         maxWaveSpeed = std::max(std::max(maxWaveSpeed,aLeft),aRight);
@@ -97,47 +112,76 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
 }
 
 void NodalAdvection::computeTimeDerivative(){
-    for(unsigned int i = 0; i<m_size+2; i++){
+    for(unsigned int i = 0; i<m_size+2; i++) {
         //Compute S *(a*delta_x*u)
         //only size 2
-        T *rightTermFirst = new T[4];
-        //for (unsigned int j = 0; j<2; j++){
-        for (unsigned int j = 0; j<4; j++){
-            //rightTermFirst[0] = s[j]*a*m_u[i][j]*m_cellSize;
-            //rightTermFirst[1] = s[2+j]*a*m_u[i][j]*m_cellSize;
-            rightTermFirst[j] = s[j]*a*m_u[i]*m_cellSize;
+        T *rightTermFirst = new T[2];
+        rightTermFirst[0]=0;
+        rightTermFirst[1]=0;
+        for (unsigned int j = 0; j<2; j++){
+        //for (unsigned int j = 0; j<4; j++){
+            if (j==0){
+                rightTermFirst[0] += s[j] * a * m_u[i].u0 * m_cellSize;
+                rightTermFirst[1] += s[2 + j] * a * m_u[i].u0 * m_cellSize;
+            }
+            else {
+                rightTermFirst[0] += s[j] * a * m_u[i].u1 * m_cellSize;
+                rightTermFirst[1] += s[2 + j] * a * m_u[i].u1 * m_cellSize;
+            }
+
+        //rightTermFirst[j] = s[j]*a*m_u[i]*m_cellSize;
+
         }
         //s.o.
         //Compute n0*netupdatesRight*delta_x
-        T *rightTermSecond = new T[4];
-        for(unsigned int k = 0; k<4; k++){
+        T *rightTermSecond = new T[2];
+        rightTermSecond[0]=0;
+        rightTermSecond[1]=0;
+        for(unsigned int k = 0; k<2; k++){
             //s.o.
-            rightTermSecond[k] = n0[k]*m_uNetUpdatesRight[i]*m_cellSize;
+            rightTermSecond[0] += n0[k]*m_uNetUpdatesRight[i]*m_cellSize;
+            rightTermSecond[1] += n0[2+k]*m_uNetUpdatesRight[i]*m_cellSize;
+            //rightTermSecond[k] = n0[k]*m_uNetUpdatesRight[i]*m_cellSize;
         }
         //s.o.
         //Compute n1*netUpdatesLeft*delta_x
-        T *rightTermThird = new T[4];
+        T *rightTermThird = new T[2];
+        rightTermThird[0]=0;
+        rightTermThird[1]=0;
         //s.o.
-        for(unsigned int l = 0; l<4; l++){
+        for(unsigned int l = 0; l<2; l++){
             //s.o.
-            rightTermThird[l] = n1[l]*m_uNetUpdatesLeft[i]*m_cellSize;
+            rightTermThird[0] += n1[l]*m_uNetUpdatesLeft[i]*m_cellSize;
+            rightTermThird[1] += n1[2+l]*m_uNetUpdatesLeft[i]*m_cellSize;
+            //rightTermThird[l] = n1[l]*m_uNetUpdatesLeft[i]*m_cellSize;
         }
         //Put right side first+second-third together
         //s.o.
-        T *rightTerm = new T[4];
-        for(unsigned int o = 0; o<4; o++){
-            //s.o.
-            rightTerm[o] = rightTermFirst[o]+rightTermSecond[o]-rightTermThird[o];
-        }
-        m_ut[i]=matmult(inv_m,rightTerm,2,2,2);
+        u rightTerm;
+        rightTerm.u0 = rightTermFirst[0]+rightTermSecond[0]-rightTermThird[0];
+        rightTerm.u1 = rightTermFirst[1]+rightTermSecond[1]-rightTermThird[1];
+
+        /*u temp = matVecMult(inv_m,rightTerm);
+        m_ut[i] = temp;*/
+        u res;
+        res.u0 = 0.0f;
+        res.u1 = 0.0f;
+        res = matVecMult(inv_m,rightTerm);
+        m_ut[i].u0=res.u0;
+        m_ut[i].u1=res.u1;
+        //m_ut[i]=matmult(inv_m,rightTerm,2,1,2);
     }
 }
 
 void NodalAdvection::computeEulerStep(T delta_t){
     for(unsigned int i = 0; i<m_size+2; i++){
-        //Commentend out because of invalid operation scalar + matrix
-        //m_u[i]=m_u[i]+(delta_t*m_ut[i]);
+        m_u[i].u0=m_u[i].u0+(delta_t*m_ut[i].u0);
+        m_u[i].u1=m_u[i].u1+(delta_t*m_ut[i].u1);
     }
+}
+
+void NodalAdvection::setBoundaryConditions() {
+    m_u[0] = m_u[1]; m_u[m_size+1] = m_u[m_size];
 }
 
 

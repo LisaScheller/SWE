@@ -41,5 +41,9 @@
 // Switch precision here
 //typedef float T;
 typedef double T;
+typedef struct u{
+    T u0;
+    T u1;
+};
 
 #endif /* TYPES_H_ */

@@ -42,6 +42,8 @@
 #include "tools/args.h"
 #include "scenarios/gaussian.h"
 #include "NodalAdvection.h"
+#include "scenarios/AdvectionGalerkin.h"
+#include "writer/AdvectionWriter.h"
 
 #include <cstring>
 
@@ -64,14 +66,16 @@ int main(int argc, char** argv)
 
 
 	// Scenario (Choose between Dambreak and gaussian)
-	scenarios::DamBreak scenario(numberOfIntervals);
+	//scenarios::DamBreak scenario(numberOfIntervals);
 	//scenarios::Gaussian scenario(args.size());
+    scenarios::AdvectionGalerkin scenario(numberOfIntervals);
 
 	// Allocate memory
 	// Water height
 
-	T *h = new T[numberOfIntervals+2];
-    T *ah = new T[numberOfIntervals+2];
+	//T *h = new T[numberOfIntervals+2];
+    u *h = new u[numberOfIntervals+2];
+    //T *ah = new T[numberOfIntervals+2];
 	// Momentum
 	T *hu = new T[numberOfIntervals+2];
     T *ahu = new T[numberOfIntervals+2];
@@ -88,7 +92,7 @@ int main(int argc, char** argv)
     }
 	memset(hu, 0, sizeof(T)*(numberOfIntervals+2));
 
-    for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
+    /*for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
         //int j = (int) i/2;
         ah[i] = scenario.getHeight(i);
     }
@@ -122,18 +126,18 @@ int main(int argc, char** argv)
         //else ah_num[i]=(h[2*i]+h[(2*i)-1])/2;
         else ah_num[i]=meanOfN(factor, ah, i);
     }
-    memset(ahu_num, 0, sizeof(T)*(args.size()+2));
+    memset(ahu_num, 0, sizeof(T)*(args.size()+2));*/
 
 	// Create a writer that is responsible printing out values
 	//writer::ConsoleWriter writer;
 	writer::VtkWriter writer("swe1d", scenario.getCellSize());
     writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
-    //writer::VtkWriter nodalAdvectionWriter("nodaladvection", 1);
+    writer::AdvectionWriter advWriter("advection", scenario.getCellSize());
 
 	// Helper class computing the wave propagation
-	WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
+	//WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
     //Helper class for compution the solution of advection equation using nodal DG
-    //NodalAdvection nodalAdvection(0.25f,h,numberOfIntervals,scenario.getCellSize());
+    NodalAdvection nodalAdvection(0.25f,h,numberOfIntervals,scenario.getCellSize());
 
 	// Write initial data
 	tools::Logger::logger.info("Initial data");
@@ -141,15 +145,17 @@ int main(int argc, char** argv)
 	// Current time of simulation
     T t = 0;
 
+    advWriter.write(t, h, hu, numberOfIntervals);
 
 
 
-	writer.write(t, h_num, hu_num, args.size());
+
+	/*writer.write(t, h_num, hu_num, args.size());
     analyticalWriter.write(t, ah_num, ahu_num, args.size());
 
     T error1 = 0.0;
     T error2 = 0.0;
-    T error3 = 0.0;
+    T error3 = 0.0;*/
 
 	for (unsigned int i = 0; i < args.timeSteps(); i++) {
 		// Do one time step
@@ -157,28 +163,28 @@ int main(int argc, char** argv)
 				<< " at time " << t << std::endl;
 
 		// Update boundaries
-		wavePropagation.setOutflowBoundaryConditions();
-        //nodalAdvection.setBoundaryConditions();
+		//wavePropagation.setOutflowBoundaryConditions();
+        nodalAdvection.setBoundaryConditions();
 
 		// Compute numerical flux on each edge
 		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
-        T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
-        //T advTimeStep = nodalAdvection.computeLocalLaxFriedrichsFluxes(t);
-        //nodalAdvection.computeTimeDerivative();
+        //T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
+        T advTimeStep = nodalAdvection.computeLocalLaxFriedrichsFluxes(t);
+        nodalAdvection.computeTimeDerivative();
 
 		// Update unknowns from net updates (Choose between unstable and Lax Friedrichs)
 		//wavePropagation.updateUnknowns(maxTimeStep);
         //wavePropagation.updateUnknownsUnstable(maxTimeStep);
-        wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
-        //nodalAdvection.computeEulerStep(advTimeStep);
+        //wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
+        nodalAdvection.computeEulerStep(advTimeStep);
 
 
 
 		// Update time
-		t += maxTimeStep;
-        //t += advTimeStep;
+		//t += maxTimeStep;
+        t += advTimeStep;
 
-        h_num[0]=h[0];
+        /*h_num[0]=h[0];
         hu_num[0]=hu[0];
         h_num[args.size()+1]=h[numberOfIntervals+1];
         hu_num[args.size()+1]=hu[numberOfIntervals+1];
@@ -188,8 +194,8 @@ int main(int argc, char** argv)
         ah_num[args.size()+1]=ah[numberOfIntervals+1];
         ahu_num[args.size()+1]=ahu[numberOfIntervals+1];
         for(int j=1; j<args.size()+1; j++) {
-            /*h_num[j] = meanOfN(factor,h_num,j);*/
-            T sum = 0.0;
+            *//*h_num[j] = meanOfN(factor,h_num,j);*/
+            /*T sum = 0.0;
             for (int k = 0; k<factor; k++){
                 sum += h[(factor*j)-k];
             }
@@ -200,7 +206,7 @@ int main(int argc, char** argv)
             /*h_num[j] = (h[2 * j] + h[(2 * j) - 1]) / 2;
             hu_num[j] = (hu[2 * j] + hu[(2 * j) - 1] / 2);
             ah_num[j] = (ah[2 * j] + ah[(2 * j) - 1]) / 2;
-            ahu_num[j] = (ahu[2 * j] + ahu[(2 * j) - 1] / 2);*/
+            ahu_num[j] = (ahu[2 * j] + ahu[(2 * j) - 1] / 2);
 
         }
         //Compute difference between exact solution and numerical method at t=2,5
@@ -210,7 +216,7 @@ int main(int argc, char** argv)
             for (int i = 0; i<args.size()+1; i++){
                 res += sqrtf((std::abs(h_num[i]-ah_num[i])*std::abs(h_num[i]-ah_num[i]))+(std::abs(hu_num[i]-ahu_num[i])*std::abs(hu_num[i]-ahu_num[i])));
             }
-            error1 = res;*/
+            error1 = res;
 
         }
         if(i==10){
@@ -219,7 +225,7 @@ int main(int argc, char** argv)
             for (int i = 0; i<args.size()+1; i++){
                 res += sqrtf((std::abs(h_num[i]-ah_num[i])*std::abs(h_num[i]-ah_num[i]))+(std::abs(hu_num[i]-ahu_num[i])*std::abs(hu_num[i]-ahu_num[i])));
             }
-            error2 = res;*/
+            error2 = res;
 
         }
         if(i==21){
@@ -228,17 +234,17 @@ int main(int argc, char** argv)
             for (int i = 0; i<args.size()+1; i++){
                 res += sqrtf((std::abs(h_num[i]-ah_num[i])*std::abs(h_num[i]-ah_num[i]))+(std::abs(hu_num[i]-ahu_num[i])*std::abs(hu_num[i]-ahu_num[i])));
             }
-            error3 = res;*/
+            error3 = res;
 
-        }
+        }*/
 
 
 		// Write new values
 		//writer.write(t, h, hu, numberOfIntervals/2);
-        writer.write(t, h_num, hu_num, numberOfIntervals / factor);
+        //writer.write(t, h_num, hu_num, numberOfIntervals / factor);
         //analyticalWriter.write(t, ah, ahu, numberOfIntervals/2);
-        analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
-        //nodalAdvectionWriter.write();
+        //analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
+        advWriter.write(t,h,hu,numberOfIntervals);
 
 
 	}
@@ -247,17 +253,17 @@ int main(int argc, char** argv)
 	// Free allocated memory
 	delete [] h;
 	delete [] hu;
-    delete [] ah;
+    /*delete [] ah;
     delete [] ahu;
     delete [] h_num;
-    delete [] hu_num;
+    delete [] hu_num;*/
 
-    std::cout << "Error at time approx. 0.5s is " << error1
+    /*std::cout << "Error at time approx. 0.5s is " << error1
               <<  std::endl;
     std::cout << "Error at time approx. 1.0s is " << error2
               <<  std::endl;
     std::cout << "Error at time approx. 2.5s is " << error3
-              <<  std::endl;
+              <<  std::endl;*/
 	return 0;
 
 }
