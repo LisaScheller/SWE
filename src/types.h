@@ -38,12 +38,16 @@
 #define TYPES_H_
 
 
+#include <vector>
+
 // Switch precision here
 //typedef float T;
-typedef double T;
+typedef long double T;
 typedef struct u{
     T u0;
     T u1;
 };
+typedef std::vector<T> vect;
+typedef std::vector<u> vecu;
 
 #endif /* TYPES_H_ */

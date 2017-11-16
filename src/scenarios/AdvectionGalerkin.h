@@ -33,7 +33,7 @@ namespace scenarios
             //Maximum (height 1) at m_size/2
             u res;
             //Standard deviation
-            double sigma = 10.0/3.0;
+            double sigma = 10.0;//3.0;
             //Get relative position in relation to m_size/2
             int x0 = m_size/2;
             int xl = pos - x0;
@@ -41,12 +41,9 @@ namespace scenarios
             T *h = new T[2];
             h[0] = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(xl/sigma)*(xl/sigma));
             h[1] = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(xr/sigma)*(xr/sigma));
-            //Observation: With this height distribution a left-going and a right-going wave can be observed
-            //But: Height of starting wave is relatively big in comparison to water depth
-            /*res.u0=10.0f*h[0] + 0.1f;
-            res.u1=10.0f*h[1] + 0.1f;*/
-            res.u0 = h[0];
-            res.u1 = h[1];
+
+            res.u0 = 10*h[0]+0.1f;
+            res.u1 = 10*h[1]+0.1f;
             return res;
         }
 

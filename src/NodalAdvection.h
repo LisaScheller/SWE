@@ -10,23 +10,20 @@
 class NodalAdvection{
 private:
     //Stiffness Matrix
-    T *s;
+    vect s;
     //Mass matrix
-    T *m;
+    vect m;
     //inverse mass matrix
-    T *inv_m;
+    vect inv_m;
     //First N-Matrix
-    T *n0;
+    vect n0;
     //Second N-Matrix
-    T *n1;
-    // m_u[nElements + 2][2]
-    //Array of left and right points of intervals
-    u *m_u;
+    vect n1;
     //Left and right fluxes
-    T *m_uNetUpdatesLeft;
-    T *m_uNetUpdatesRight;
+    vect m_uNetUpdatesLeft;
+    vect m_uNetUpdatesRight;
     //Time derivative of u
-    u *m_ut;
+    vecu m_ut;
     int m_size;
 
     //Time variables
@@ -36,57 +33,73 @@ private:
 
     T m_cellSize;
 public:
-    NodalAdvection(float a_def, u *h, unsigned int size, unsigned int cellsize):
+    NodalAdvection(float a_def, vecu h, unsigned int size, unsigned int cellsize):
             a(a_def),
             m_size(size),
-            m_u(h),
-            m_cellSize(cellsize)
+            m_u(h.size()),
+            m_ut(h.size()),
+            m_uNetUpdatesRight(size,0.0),
+            m_uNetUpdatesLeft(size,0.0),
+            m_cellSize(cellsize),
+            s(4),
+            m(4),
+            inv_m(4),
+            n0(4),
+            n1(4)
             {   //Allocate matrices
-                s = new T[4];
-                m = new T[4];
-                inv_m = new T[4];
-                n0 = new T[4];
-                n1 = new T[4];
-                m_uNetUpdatesLeft = new T[size+1];
-                m_uNetUpdatesRight = new T[size+1];
-                m_ut = new u[m_size+2];
+
+                //vect m_uNetUpdatesLeft(size+1);
+                //vect m_uNetUpdatesRight(size+1);
+
+                /*for (unsigned int j = 0; j< size+1; j++){
+                    m_uNetUpdatesLeft[j]=0.0;
+                    m_uNetUpdatesRight[j]=0.0;
+                }*/
+                //vecu m_ut(size+2);
+                //vecu m_u(size+2);
+                for (unsigned int i = 0; i<size+2; i++){
+                    m_u[i].u0 = h[i].u0;
+                    m_u[i].u1 = h[i].u1;
+                    m_ut.at(i).u0 = 0.0;
+                    m_ut.at(i).u1 = 0.0;
+                }
 
 
                 //Define entries of matrices (0=00, 1 = 01, 2 = 10, 3 = 11)
-                s[0] = -0.5f;
-                s[1] = -0.5f;
-                s[2] = 0.5f;
-                s[3] = 0.5f;
+                s[0] = -0.5;
+                s[1] = -0.5;
+                s[2] = 0.5;
+                s[3] = 0.5;
 
-                m[0] = 1.0f/3.0f;
-                m[1] = 1.0f/6.0f;
-                m[2] = 1.0f/6.0f;
-                m[3] = 1.0f/3.0f;
+                m[0] = 1.0f/3.0;
+                m[1] = 1.0f/6.0;
+                m[2] = 1.0f/6.0;
+                m[3] = 1.0f/3.0;
 
-                inv_m[0] = 4.0f;
-                inv_m[1] = -2.0f;
-                inv_m[2] = -2.0f;
-                inv_m[3] = 4.0f;
+                inv_m[0] = 4.0;
+                inv_m[1] = -2.0;
+                inv_m[2] = -2.0;
+                inv_m[3] = 4.0;
 
-                n0[0] = 1.0f;
-                n0[1] = 0.0f;
-                n0[2] = 0.0f;
-                n0[3] = 0.0f;
+                n0[0] = 1.0;
+                n0[1] = 0.0;
+                n0[2] = 0.0;
+                n0[3] = 0.0;
 
-                n1[0] = 0.0f;
-                n1[1] = 0.0f;
-                n1[2] = 0.0f;
-                n1[3] = 1.0f;
+                n1[0] = 0.0;
+                n1[1] = 0.0;
+                n1[2] = 0.0;
+                n1[3] = 1.0;
 
                 for (int i = 0; i<m_size+2; i++){
-                    m_ut[i].u0 = 0.0f;
-                    m_ut[i].u1 = 0.0f;
+                    m_ut[i].u0 = 0.0;
+                    m_ut[i].u1 = 0.0;
                 }
 
             }
 
     ~NodalAdvection(){
-        //Free allocated memory
+       /* //Free allocated memory
         delete [] s;
         delete [] m;
         delete [] inv_m;
@@ -94,7 +107,7 @@ public:
         delete [] n1;
         delete [] m_uNetUpdatesLeft;
         delete [] m_uNetUpdatesRight;
-        delete [] m_ut;
+        delete [] m_ut;*/
     }
     //Methods
     void setBoundaryConditions();
@@ -105,6 +118,12 @@ public:
     void computeTimeDerivative();
 
     void computeEulerStep(T delta_t);
+
+// m_u[nElements + 2][2]
+//Array of left and right points of intervals
+vecu m_u;
+
+    vecu setH();
 };
 
 #endif //SWE1D_NODALADVECTION_H

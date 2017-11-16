@@ -47,7 +47,7 @@
 
 #include <cstring>
 
-T meanOfN(int n, T *q, int j){
+T meanOfN(int n, vect q, int j){
     T sum = 0.0;
     for (int i = 0; i<n; i++){
         sum += q[(n*j)-i];
@@ -74,23 +74,23 @@ int main(int argc, char** argv)
 	// Water height
 
 	//T *h = new T[numberOfIntervals+2];
-    u *h = new u[numberOfIntervals+2];
+    vecu h(numberOfIntervals+2);
     //T *ah = new T[numberOfIntervals+2];
 	// Momentum
-	T *hu = new T[numberOfIntervals+2];
-    T *ahu = new T[numberOfIntervals+2];
+	vect hu(numberOfIntervals+2);
+    /*T *ahu = new T[numberOfIntervals+2];
 
     T *h_num = new T[args.size()+2];
     T *hu_num = new T[args.size()+2];
     T *ah_num = new T[args.size()+2];
-    T *ahu_num = new T[args.size()+2];
+    T *ahu_num = new T[args.size()+2];*/
 
 	// Initialize water height and momentum
 	for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
         //int j = (int) i / 2;
         h[i] = scenario.getHeight(i);
     }
-	memset(hu, 0, sizeof(T)*(numberOfIntervals+2));
+	//memset(hu, 0, sizeof(T)*(numberOfIntervals+2));
 
     /*for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
         //int j = (int) i/2;
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
 	// Helper class computing the wave propagation
 	//WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
     //Helper class for compution the solution of advection equation using nodal DG
-    NodalAdvection nodalAdvection(0.25f,h,numberOfIntervals,scenario.getCellSize());
+    NodalAdvection nodalAdvection(-0.25,h,numberOfIntervals,scenario.getCellSize());
 
 	// Write initial data
 	tools::Logger::logger.info("Initial data");
@@ -244,6 +244,7 @@ int main(int argc, char** argv)
         //writer.write(t, h_num, hu_num, numberOfIntervals / factor);
         //analyticalWriter.write(t, ah, ahu, numberOfIntervals/2);
         //analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
+        h = nodalAdvection.setH();
         advWriter.write(t,h,hu,numberOfIntervals);
 
 
@@ -251,8 +252,9 @@ int main(int argc, char** argv)
 
 
 	// Free allocated memory
-	delete [] h;
-	delete [] hu;
+
+	//delete [] h;
+	//delete [] hu;
     /*delete [] ah;
     delete [] ahu;
     delete [] h_num;

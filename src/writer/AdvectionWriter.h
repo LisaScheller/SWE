@@ -68,7 +68,7 @@ namespace writer
          *
          * @param size Number of cells (without boundary values)
          */
-        void write(const T time, const u *h, const T *hu, unsigned int size)
+        void write(const T time, const vecu h, const vect hu, unsigned int size)
         {
             // generate vtk file name
             std::string l_fileName = generateFileName();
@@ -84,6 +84,7 @@ namespace writer
             std::ofstream vtkFile(l_fileName.c_str());
             assert(vtkFile.good());
 
+            int testsize = 2*size;
             // vtk xml header
             vtkFile << "<?xml version=\"1.0\"?>" << std::endl
                     << "<VTKFile type=\"RectilinearGrid\">" << std::endl
@@ -96,9 +97,12 @@ namespace writer
                     << "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl;
 
             // grid points
-            for (int i=0; i < size+1; i++) {
+            vtkFile << m_cellSize * 0 << "" << std::endl;
+            for (int i=1; i < size; i++) {
+                vtkFile << m_cellSize * i << "" << std::endl;
                 vtkFile << m_cellSize * i << "" << std::endl;
             }
+            vtkFile << m_cellSize * size << "" << std::endl;
 
             vtkFile << "</DataArray>" << std::endl;
 
@@ -116,17 +120,17 @@ namespace writer
 
             // water surface height
             vtkFile << "<DataArray Name=\"h\" type=\"Float64\"  format=\"ascii\">" << std::endl;
-            for (int i=1; i < size+1; i++) {
+            vtkFile << h[0].u0 << std::endl;
+            //vtkFile << h[0].u1 << std::endl;
+            for (int i=1; i < size; i++) {
                 vtkFile << h[i].u0 << std::endl;
+                vtkFile << h[i].u1 << std::endl;
             }
+            //vtkFile << h[size].u0 << std::endl;
+            vtkFile << h[size].u1 << std::endl;
             vtkFile << "</DataArray>" << std::endl;
 
-            // momentum
-            vtkFile << "<DataArray Name=\"hu\" type=\"Float64\" format=\"ascii\">" << std::endl;
-            for (int i=1; i < size+1; i++) {
-                vtkFile << hu[i] << std::endl;
-            }
-            vtkFile << "</DataArray>" << std::endl;
+
 
             // bathymetry
             //vtkFile << "<DataArray Name=\"B\" type=\"Float32\" format=\"ascii\">" << std::endl;
