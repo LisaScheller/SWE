@@ -101,7 +101,7 @@ public:
 	 *
 	 * @param size Number of cells (without boundary values)
 	 */
-	void write(const T time, const T *h, const T *hu, unsigned int size)
+	void write(const T time, vect h, vect hu, unsigned int size)
 	{
 		// generate vtk file name
 		std::string l_fileName = generateFileName();

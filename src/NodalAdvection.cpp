@@ -211,4 +211,19 @@ vecu NodalAdvection::setH(){
     return result;
 }
 
+vect NodalAdvection::getExactSolution(T t){
+    vect res(m_size+2, 0.0);
+    //Attention: Only works for specific size and function as defined in AdvectionGalerkin.h at the moment
+    //TODO Get needed information from main
+    double sigma = 10.0;//3.0;
+    for (unsigned int pos; pos <m_size+2; pos++){
+        int x0 = m_size/2;
+        int x = pos - x0;
+        x = x - a*t;
+        res.at(pos) = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma));
+        res.at(pos) = 10*res.at(pos)+0.1;
+    }
+    return res;
+}
+
 

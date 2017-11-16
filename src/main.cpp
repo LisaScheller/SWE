@@ -147,6 +147,10 @@ int main(int argc, char** argv)
 
     advWriter.write(t, h, hu, numberOfIntervals);
 
+    vect hAnalytic(numberOfIntervals+2, 0.0);
+    hAnalytic = nodalAdvection.getExactSolution(t);
+    analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
+
 
 
 
@@ -245,7 +249,9 @@ int main(int argc, char** argv)
         //analyticalWriter.write(t, ah, ahu, numberOfIntervals/2);
         //analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
         h = nodalAdvection.setH();
+        hAnalytic = nodalAdvection.getExactSolution(t);
         advWriter.write(t,h,hu,numberOfIntervals);
+        analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
 
 
 	}

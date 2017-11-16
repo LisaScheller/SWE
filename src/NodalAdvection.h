@@ -22,6 +22,8 @@ private:
     //Left and right fluxes
     vect m_uNetUpdatesLeft;
     vect m_uNetUpdatesRight;
+    //u
+    vecu m_u;
     //Time derivative of u
     vecu m_ut;
     int m_size;
@@ -91,11 +93,6 @@ public:
                 n1[2] = 0.0;
                 n1[3] = 1.0;
 
-                for (int i = 0; i<m_size+2; i++){
-                    m_ut[i].u0 = 0.0;
-                    m_ut[i].u1 = 0.0;
-                }
-
             }
 
     ~NodalAdvection(){
@@ -119,11 +116,9 @@ public:
 
     void computeEulerStep(T delta_t);
 
-// m_u[nElements + 2][2]
-//Array of left and right points of intervals
-vecu m_u;
-
     vecu setH();
+
+    vect getExactSolution(T t);
 };
 
 #endif //SWE1D_NODALADVECTION_H
