@@ -44,8 +44,11 @@
 #include "NodalAdvection.h"
 #include "scenarios/AdvectionGalerkin.h"
 #include "writer/AdvectionWriter.h"
+#include "scenarios/SWEGalerkin.h"
+#include "GalerkinSWE.h"
 
 #include <cstring>
+#include <GalerkinWriter.h>
 
 T meanOfN(int n, vect q, int j){
     T sum = 0.0;
@@ -69,15 +72,18 @@ int main(int argc, char** argv)
 	//scenarios::DamBreak scenario(numberOfIntervals);
 	//scenarios::Gaussian scenario(args.size());
     scenarios::AdvectionGalerkin scenario(numberOfIntervals);
+    //scenarios::SWEGalerkin scenario(numberOfIntervals);
 
 	// Allocate memory
 	// Water height
 
 	//T *h = new T[numberOfIntervals+2];
     vecu h(numberOfIntervals+2);
+    //vecq q(numberOfIntervals+2);
     //T *ah = new T[numberOfIntervals+2];
 	// Momentum
-	vect hu(numberOfIntervals+2);
+    vect hu(numberOfIntervals+2);
+	//vecu hu(numberOfIntervals+2);
     /*T *ahu = new T[numberOfIntervals+2];
 
     T *h_num = new T[args.size()+2];
@@ -86,9 +92,13 @@ int main(int argc, char** argv)
     T *ahu_num = new T[args.size()+2];*/
 
 	// Initialize water height and momentum
-	for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
+	/*for (unsigned int i = 0; i < numberOfIntervals+2; i++) {
         //int j = (int) i / 2;
-        h[i] = scenario.getHeight(i);
+        h.at(i) = scenario.getHeight(i);
+
+    }*/
+    for (unsigned int i = 0; i < numberOfIntervals+2; i++){
+        h.at(i) = scenario.getHeight(i);
     }
 	//memset(hu, 0, sizeof(T)*(numberOfIntervals+2));
 
@@ -130,14 +140,16 @@ int main(int argc, char** argv)
 
 	// Create a writer that is responsible printing out values
 	//writer::ConsoleWriter writer;
-	writer::VtkWriter writer("swe1d", scenario.getCellSize());
+	//writer::VtkWriter writer("swe1d", scenario.getCellSize());
     writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
     writer::AdvectionWriter advWriter("advection", scenario.getCellSize());
+    //writer::GalerkinWriter galWriter("galerkin", scenario.getCellSize());
 
 	// Helper class computing the wave propagation
 	//WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
     //Helper class for compution the solution of advection equation using nodal DG
     NodalAdvection nodalAdvection(-0.25,h,numberOfIntervals,scenario.getCellSize());
+    //GalerkinSWE galerkin(q,numberOfIntervals,scenario.getCellSize());
 
 	// Write initial data
 	tools::Logger::logger.info("Initial data");
@@ -151,6 +163,7 @@ int main(int argc, char** argv)
     hAnalytic = nodalAdvection.getExactSolution(t);
     analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
 
+    //galWriter.write(t,q,numberOfIntervals);
 
 
 
@@ -169,24 +182,28 @@ int main(int argc, char** argv)
 		// Update boundaries
 		//wavePropagation.setOutflowBoundaryConditions();
         nodalAdvection.setBoundaryConditions();
+        //galerkin.setBoundaryConditions();
 
 		// Compute numerical flux on each edge
 		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
         //T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
         T advTimeStep = nodalAdvection.computeLocalLaxFriedrichsFluxes(t);
+        //T galTimeStep = galerkin.computeLocalLaxFriedrichsFluxes(t);
         nodalAdvection.computeTimeDerivative();
+        //galerkin.computeTimeDerivative();
 
 		// Update unknowns from net updates (Choose between unstable and Lax Friedrichs)
 		//wavePropagation.updateUnknowns(maxTimeStep);
         //wavePropagation.updateUnknownsUnstable(maxTimeStep);
         //wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
         nodalAdvection.computeEulerStep(advTimeStep);
-
+        //galerkin.computeEulerStep(galTimeStep);
 
 
 		// Update time
 		//t += maxTimeStep;
         t += advTimeStep;
+        //t += galTimeStep;
 
         /*h_num[0]=h[0];
         hu_num[0]=hu[0];
@@ -252,7 +269,8 @@ int main(int argc, char** argv)
         hAnalytic = nodalAdvection.getExactSolution(t);
         advWriter.write(t,h,hu,numberOfIntervals);
         analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
-
+        /*q = galerkin.setQ();
+        galWriter.write(t,q,numberOfIntervals);*/
 
 	}
 

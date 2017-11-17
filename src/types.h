@@ -47,7 +47,12 @@ typedef struct u{
     T u0;
     T u1;
 };
+typedef struct q{
+    u h;
+    u hu;
+};
 typedef std::vector<T> vect;
 typedef std::vector<u> vecu;
+typedef std::vector<q> vecq;
 
 #endif /* TYPES_H_ */
