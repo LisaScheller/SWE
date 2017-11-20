@@ -35,13 +35,13 @@ private:
 
     T m_cellSize;
 public:
-    NodalAdvection(float a_def, vecu h, unsigned int size, unsigned int cellsize):
+    NodalAdvection(float a_def, vecu h, unsigned int size, T cellsize):
             a(a_def),
             m_size(size),
             m_u(h.size()),
             m_ut(h.size()),
-            m_uNetUpdatesRight(size,0.0),
-            m_uNetUpdatesLeft(size,0.0),
+            m_uNetUpdatesRight(size+2,0.0),
+            m_uNetUpdatesLeft(size+2,0.0),
             m_cellSize(cellsize),
             s(4),
             m(4),
@@ -59,12 +59,20 @@ public:
                 }*/
                 //vecu m_ut(size+2);
                 //vecu m_u(size+2);
-                for (unsigned int i = 0; i<size+2; i++){
-                    m_u[i].u0 = h[i].u0;
-                    m_u[i].u1 = h[i].u1;
+                for (unsigned int i = 1; i<size+1; i++){
+                    m_u.at(i).u0 = h[i].u0;
+                    m_u.at(i).u1 = h[i].u1;
                     m_ut.at(i).u0 = 0.0;
                     m_ut.at(i).u1 = 0.0;
                 }
+                m_u[0].u0 = m_u.at(1).u0;
+                m_u[0].u1 = m_u.at(1).u1;
+                m_u[size+1].u0 = m_u.at(size).u0;
+                m_u[size+1].u1 = m_u.at(size).u1;
+                m_ut.at(0).u0 = 0.0;
+                m_ut.at(0).u1 = 0.0;
+                m_ut.at(size+1).u0 = 0.0;
+                m_ut.at(size+1).u1 = 0.0;
 
 
                 //Define entries of matrices (0=00, 1 = 01, 2 = 10, 3 = 11)
@@ -118,7 +126,11 @@ public:
 
     vecu setH();
 
-    vect getExactSolution(T t);
+    vect getExactSolution(T t, int numberOfIntervals);
+
+    T getXOfMax();
+
+    T computeError(vecu vector);
 };
 
 #endif //SWE1D_NODALADVECTION_H

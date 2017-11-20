@@ -84,13 +84,13 @@ namespace writer
             std::ofstream vtkFile(l_fileName.c_str());
             assert(vtkFile.good());
 
-            int testsize = 2*size;
+            int testsize = 1*size;
             // vtk xml header
             vtkFile << "<?xml version=\"1.0\"?>" << std::endl
                     << "<VTKFile type=\"RectilinearGrid\">" << std::endl
-                    << "<RectilinearGrid WholeExtent=\"0 " << size
+                    << "<RectilinearGrid WholeExtent=\"0 " << testsize
                     << " 0 0 0 0\">" << std::endl
-                    << "<Piece Extent=\"0 " << size
+                    << "<Piece Extent=\"0 " << testsize
                     << " 0 0 0 0\">" << std::endl;
 
             vtkFile << "<Coordinates>" << std::endl
@@ -100,7 +100,7 @@ namespace writer
             vtkFile << m_cellSize * 0 << "" << std::endl;
             for (int i=1; i < size; i++) {
                 vtkFile << m_cellSize * i << "" << std::endl;
-                vtkFile << m_cellSize * i << "" << std::endl;
+                //vtkFile << m_cellSize * i << "" << std::endl;
             }
             vtkFile << m_cellSize * size << "" << std::endl;
 
@@ -120,10 +120,10 @@ namespace writer
 
             // water surface height
             vtkFile << "<DataArray Name=\"h\" type=\"Float64\"  format=\"ascii\">" << std::endl;
-            vtkFile << h[0].u0 << std::endl;
-            //vtkFile << h[0].u1 << std::endl;
+            //vtkFile << h[0].u0 << std::endl;
+            vtkFile << h[0].u1 << std::endl;
             for (int i=1; i < size; i++) {
-                vtkFile << h[i].u0 << std::endl;
+                //vtkFile << h[i].u0 << std::endl;
                 vtkFile << h[i].u1 << std::endl;
             }
             //vtkFile << h[size].u0 << std::endl;

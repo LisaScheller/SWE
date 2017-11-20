@@ -44,11 +44,12 @@
 #include "NodalAdvection.h"
 #include "scenarios/AdvectionGalerkin.h"
 #include "writer/AdvectionWriter.h"
+#include "writer/GalerkinWriter.h"
 #include "scenarios/SWEGalerkin.h"
 #include "GalerkinSWE.h"
 
 #include <cstring>
-#include <GalerkinWriter.h>
+
 
 T meanOfN(int n, vect q, int j){
     T sum = 0.0;
@@ -64,8 +65,7 @@ int main(int argc, char** argv)
 {
 	// Parse command line parameters
 	tools::Args args(argc, argv);
-    int factor = 1;
-    int numberOfIntervals = (factor*args.size());
+    int numberOfIntervals = args.size();
 
 
 	// Scenario (Choose between Dambreak and gaussian)
@@ -97,6 +97,7 @@ int main(int argc, char** argv)
         h.at(i) = scenario.getHeight(i);
 
     }*/
+
     for (unsigned int i = 0; i < numberOfIntervals+2; i++){
         h.at(i) = scenario.getHeight(i);
     }
@@ -141,14 +142,15 @@ int main(int argc, char** argv)
 	// Create a writer that is responsible printing out values
 	//writer::ConsoleWriter writer;
 	//writer::VtkWriter writer("swe1d", scenario.getCellSize());
-    writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
+    //writer::VtkWriter analyticalWriter("analytical", scenario.getCellSize());
     writer::AdvectionWriter advWriter("advection", scenario.getCellSize());
     //writer::GalerkinWriter galWriter("galerkin", scenario.getCellSize());
 
 	// Helper class computing the wave propagation
 	//WavePropagation wavePropagation(h, hu, ah, ahu, numberOfIntervals, scenario.getCellSize());
     //Helper class for compution the solution of advection equation using nodal DG
-    NodalAdvection nodalAdvection(-0.25,h,numberOfIntervals,scenario.getCellSize());
+    T a = -1.25;
+    NodalAdvection nodalAdvection(a,h,numberOfIntervals,scenario.getCellSize());
     //GalerkinSWE galerkin(q,numberOfIntervals,scenario.getCellSize());
 
 	// Write initial data
@@ -160,8 +162,8 @@ int main(int argc, char** argv)
     advWriter.write(t, h, hu, numberOfIntervals);
 
     vect hAnalytic(numberOfIntervals+2, 0.0);
-    hAnalytic = nodalAdvection.getExactSolution(t);
-    analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
+    hAnalytic = nodalAdvection.getExactSolution(t, numberOfIntervals);
+    //analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
 
     //galWriter.write(t,q,numberOfIntervals);
 
@@ -174,11 +176,23 @@ int main(int argc, char** argv)
     T error2 = 0.0;
     T error3 = 0.0;*/
 
-	for (unsigned int i = 0; i < args.timeSteps(); i++) {
+    //Time for one full round
+    T tRound = 100/std::abs(a);
+    vecu h0 = h;
+    T error = 0.0;
+    T timestepsize = 0.0;
+    int iRound = 0;
+    int maxTimeSteps = args.timeSteps();
+    bool errorComputing = false;
+
+	for (unsigned int i = 0; i < maxTimeSteps+1; i++) {
 		// Do one time step
 		tools::Logger::logger << "Computing timestep " << i
 				<< " at time " << t << std::endl;
 
+        if (iRound > 0 && i == iRound+1){
+            error = nodalAdvection.computeError(h0);
+        }
 		// Update boundaries
 		//wavePropagation.setOutflowBoundaryConditions();
         nodalAdvection.setBoundaryConditions();
@@ -188,6 +202,11 @@ int main(int argc, char** argv)
 		//T maxTimeStep = wavePropagation.computeNumericalFluxes();
         //T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
         T advTimeStep = nodalAdvection.computeLocalLaxFriedrichsFluxes(t);
+        if (i == 0 && errorComputing){
+            timestepsize = advTimeStep;
+            iRound = ((int)tRound/timestepsize)+1;
+            maxTimeSteps = iRound + 10;
+        }
         //T galTimeStep = galerkin.computeLocalLaxFriedrichsFluxes(t);
         nodalAdvection.computeTimeDerivative();
         //galerkin.computeTimeDerivative();
@@ -266,11 +285,15 @@ int main(int argc, char** argv)
         //analyticalWriter.write(t, ah, ahu, numberOfIntervals/2);
         //analyticalWriter.write(t, ah_num, ahu_num, numberOfIntervals/factor);
         h = nodalAdvection.setH();
-        hAnalytic = nodalAdvection.getExactSolution(t);
+        hAnalytic = nodalAdvection.getExactSolution(t, numberOfIntervals);
         advWriter.write(t,h,hu,numberOfIntervals);
-        analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
+        //analyticalWriter.write(t, hAnalytic, hu, numberOfIntervals);
         /*q = galerkin.setQ();
         galWriter.write(t,q,numberOfIntervals);*/
+
+
+
+
 
 	}
 
@@ -290,6 +313,9 @@ int main(int argc, char** argv)
               <<  std::endl;
     std::cout << "Error at time approx. 2.5s is " << error3
               <<  std::endl;*/
+    if (errorComputing){
+        std::cout << "Error after one circle is " << error << std::endl;
+    }
 	return 0;
 
 }

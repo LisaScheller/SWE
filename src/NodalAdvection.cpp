@@ -84,7 +84,7 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
     T deltaT = t - t0;
     t0 = t;
     //Loop over all intervalls
-    for(unsigned int i = 1; i<m_size; i++){
+    for(unsigned int i = 1; i<m_size+1; i++){
         //Factor a for local Lax Friedrichs Method (aLeft = a_i-1/2, aRight = a_i+1/2
         T aLeft;
         T aRight;
@@ -106,15 +106,15 @@ T NodalAdvection::computeLocalLaxFriedrichsFluxes(T t){
         maxWaveSpeed = std::max(std::max(maxWaveSpeed,aLeft),aRight);
 
     }
-    // Compute CFL condition (delta_t = delta_x/(a*3))
-
-    T maxTimeStep = m_cellSize/(std::abs(a)*3);
+    // Compute CFL condition (delta_t <= c/a*(delta_x/2)) (DG book p. 97)
+    T c = 0.04;
+    T maxTimeStep = 0.5*m_cellSize*(c/std::abs(a));
 
     return maxTimeStep;
 }
 
 void NodalAdvection::computeTimeDerivative(){
-    for(unsigned int i = 1; i<m_size; i++) {
+    for(unsigned int i = 1; i<m_size+1; i++) {
         //Compute S *(a*delta_x*u)
         //only size 2
         vect rightTermFirst(2,0.0);
@@ -182,7 +182,7 @@ void NodalAdvection::computeEulerStep(T delta_t){
         m_u.at(i).u0=m_u.at(i).u0+(delta_t*m_ut.at(i).u0);
         m_u.at(i).u1=m_u.at(i).u1+(delta_t*m_ut.at(i).u1);
     }*/
-    for (unsigned int j = 0; j<m_size+2; j++) {
+    /*for (unsigned int j = 0; j<m_size+2; j++) {
         if (tmp.at(j).u0 > 0.1 && tmp.at(j).u1 > 0.1) {
             m_u.at(j).u0 = tmp.at(j).u0;
             m_u.at(j).u1 = tmp.at(j).u1;
@@ -193,11 +193,16 @@ void NodalAdvection::computeEulerStep(T delta_t){
         else if (tmp.at(j).u0 > 0.1 && tmp.at(j).u1 <= 0.1){
             m_u.at(j).u0 = tmp.at(j).u0;
         }
+    }*/
+    for (unsigned int j = 0; j < m_size+2; j++){
+        m_u.at(j).u0 = tmp.at(j).u0;
+        m_u.at(j).u1 = tmp.at(j).u1;
     }
 }
 
 void NodalAdvection::setBoundaryConditions() {
-    m_u.at(0) = m_u.at(1); m_u.at(m_size+1) = m_u.at(m_size);
+    //Periodic boundary conditions
+    m_u.at(0) = m_u.at(m_size); m_u.at(m_size+1) = m_u.at(1);
 }
 
 vecu NodalAdvection::setH(){
@@ -211,19 +216,41 @@ vecu NodalAdvection::setH(){
     return result;
 }
 
-vect NodalAdvection::getExactSolution(T t){
+vect NodalAdvection::getExactSolution(T t, int numberOfIntervals){
     vect res(m_size+2, 0.0);
     //Attention: Only works for specific size and function as defined in AdvectionGalerkin.h at the moment
-    //TODO Get needed information from main
+    T delta_x = 100.0/numberOfIntervals;
+
+
     double sigma = 10.0;//3.0;
-    for (unsigned int pos; pos <m_size+2; pos++){
-        int x0 = m_size/2;
-        int x = pos - x0;
+    for (unsigned int pos = 0; pos <m_size+2; pos++){
+        int x0 = 50;
+        T x = pos*delta_x - x0;
         x = x - a*t;
         res.at(pos) = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma));
         res.at(pos) = 10*res.at(pos)+0.1;
     }
     return res;
+}
+
+T NodalAdvection::getXOfMax(){
+    T x = -1.0;
+    T max = 0.0;
+    for (unsigned int i = 0; i<m_size+2; i++){
+        if (m_u.at(i).u0>max){
+            max = m_u.at(i).u0;
+            x = (double) i;
+        }
+    }
+    return x*m_cellSize;
+}
+
+T NodalAdvection::computeError(vecu h0) {
+    T res = 0.0;
+    for(unsigned int i = 1; i<m_size+1; i++){
+        res += std::abs((m_u.at(i).u0 - h0.at(i).u0)*(m_u.at(i).u0 - h0.at(i).u0));
+    }
+    return std::sqrt(res);
 }
 
 
