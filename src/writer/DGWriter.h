@@ -1,10 +1,9 @@
 //
-// Created by lisa on 17.11.17.
+// Created by lisa on 23.11.17.
 //
 
-#ifndef SWE1D_GALERKINWRITER_H
-#define SWE1D_GALERKINWRITER_H
-
+#ifndef SWE1D_DGWRITER_H
+#define SWE1D_DGWRITER_H
 #include "../types.h"
 
 #include <cassert>
@@ -18,7 +17,7 @@ namespace writer
 /**
  * A writer class that generates vtk files
  */
-    class GalerkinWriter
+    class DGWriter
     {
     private:
         // base name of the vtp collectiond and vtk files
@@ -36,7 +35,7 @@ namespace writer
 
     public:
         // constructor
-        GalerkinWriter( const std::string& basename = "galerkin", const T cellSize = 1)
+        DGWriter( const std::string& basename = "DG", const T cellSize = 1)
                 : m_basename(basename),
                   m_cellSize(cellSize),
                   m_timeStep(0)
@@ -56,7 +55,7 @@ namespace writer
         }
 
         // destructor (free memory)
-        ~GalerkinWriter() {
+        ~DGWriter() {
             // close vtp file
             *m_vtpFile
                     << "</Collection>" << std::endl
@@ -86,59 +85,69 @@ namespace writer
             assert(vtkFile.good());
 
             // vtk xml header
-            vtkFile << "<?xml version=\"1.0\"?>" << std::endl
-                    << "<VTKFile type=\"RectilinearGrid\">" << std::endl
-                    << "<RectilinearGrid WholeExtent=\"0 " << size
-                    << " 0 0 0 0\">" << std::endl
-                    << "<Piece Extent=\"0 " << size
-                    << " 0 0 0 0\">" << std::endl;
+            vtkFile << "<VTKFile type=\"UnstructuredGrid\">" << std::endl;
 
-            vtkFile << "<Coordinates>" << std::endl
-                    << "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl;
 
-            // grid points
-            vtkFile << m_cellSize * 0 << "" << std::endl;
-            for (int i=1; i < size; i++) {
-                vtkFile << m_cellSize * i << "" << std::endl;
-                //vtkFile << m_cellSize * i << "" << std::endl;
+
+            vtkFile << "<UnstructuredGrid>" << std::endl;
+            vtkFile << "<Piece NumberOfPoints=\""<< size*2<< "\" NumberOfCells=\""<< size <<"\">" << std::endl;
+            vtkFile << "<Points>" << std::endl;
+            vtkFile << "<DataArray Name=\"xyz\" NumberOfComponents=\"3\" type=\"Float64\" format=\"ascii\">" << std::endl;
+
+            //  points
+            vtkFile << m_cellSize * 0 << " " << 0.0 << " " << 0.0 <<std::endl;
+            for (int i=0; i < size; i++) {
+                vtkFile << m_cellSize * i << " " << 0.0 << " " << 0.0 <<std::endl;
+                vtkFile << m_cellSize * i << " " << 0.0 << " " << 0.0 <<std::endl;
             }
-            vtkFile << m_cellSize * size << "" << std::endl;
+            vtkFile << m_cellSize * size << " " << 0.0 << " " << 0.0 <<std::endl;
 
             vtkFile << "</DataArray>" << std::endl;
+            vtkFile << "</Points>" << std::endl;
 
-            vtkFile	<< "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl
-                       << "0" << std::endl
-                       << "</DataArray>" << std::endl;
+            vtkFile << "<Cells>" << std::endl;
+            vtkFile << "<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">" << std::endl;
+            for (unsigned int i = 0; i< size+1; i++){
+                vtkFile << 2*i << " " << (2*i)+1 << std::endl;
+            }
+            vtkFile << "</DataArray>" << std::endl;
+            vtkFile << "<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">" << std::endl;
+            for (unsigned int i = 0; i< size+1; i++){
+                vtkFile<< 2+(2*i) << std::endl;
+            }
+            vtkFile << "</DataArray>" << std::endl;
+            vtkFile << "<DataArray type=\"Int64\" Name=\"types\" format=\"ascii\">" << std::endl;
+            for (unsigned int i = 0; i< size+1; i++){
+                vtkFile << 3 << std::endl;
+            }
+            vtkFile << "</DataArray>" << std::endl;
+            vtkFile << "</Cells>" << std::endl;
 
-            vtkFile	<< "<DataArray type=\"Float64\" format=\"ascii\">" << std::endl
-                       << "0" << std::endl
-                       << "</DataArray>" << std::endl;
-
-            vtkFile << "</Coordinates>" << std::endl;
-
-            vtkFile << "<CellData>" << std::endl;
+            vtkFile << "<PointData>" << std::endl;
 
             // water surface height
-            vtkFile << "<DataArray Name=\"h\" type=\"Float64\"  format=\"ascii\">" << std::endl;
-            vtkFile << q.at(0).h.u0 << std::endl;
-            //vtkFile << h[0].u1 << std::endl;
-            for (int i=1; i < size; i++) {
+            vtkFile << "<DataArray Name=\"h\" NumberOfComponents=\"1\" type=\"Float64\"  format=\"ascii\">" << std::endl;
+
+            for (int i=0; i < size+1; i++) {
                 vtkFile << q.at(i).h.u0 << std::endl;
-                //vtkFile << q.at(i).h.u1 << std::endl;
+                vtkFile << q.at(i).h.u1 << std::endl;
             }
-            //vtkFile << h[size].u0 << std::endl;
-            vtkFile << q.at(size).h.u1 << std::endl;
             vtkFile << "</DataArray>" << std::endl;
 
             // momentum
-            vtkFile << "<DataArray Name=\"hu\" type=\"Float64\" format=\"ascii\">" << std::endl;
-            vtkFile << q.at(0).hu.u0 << std::endl;
-            for (int i=1; i < size; i++){
+            vtkFile << "<DataArray Name=\"hu\" NumberOfComponents=\"1\" type=\"Float64\" format=\"ascii\">" << std::endl;
+
+            for (int i=0; i < size+1; i++){
                 vtkFile << q.at(i).hu.u0 << std::endl;
-                //vtkFile << q.at(i).hu.u1 << std::endl;
+                vtkFile << q.at(i).hu.u1 << std::endl;
             }
-            vtkFile << q.at(size).hu.u1 << std::endl;
+
             vtkFile << "</DataArray>" << std::endl;
+
+            vtkFile << "</PointData>" << std::endl;
+
+            vtkFile << "<CellData>" << std::endl;
+            vtkFile << "</CellData>" << std::endl;
 
             // bathymetry
             //vtkFile << "<DataArray Name=\"B\" type=\"Float32\" format=\"ascii\">" << std::endl;
@@ -146,10 +155,9 @@ namespace writer
             //		vtkFile << b[i] << std::endl;
             //vtkFile << "</DataArray>" << std::endl;
 
-            vtkFile << "</CellData>" << std::endl
-                    << "</Piece>" << std::endl;
+            vtkFile << "</Piece>" << std::endl;
 
-            vtkFile << "</RectilinearGrid>" << std::endl
+            vtkFile << "</UnstructuredGrid>" << std::endl
                     << "</VTKFile>" << std::endl;
 
             // increment time step
@@ -163,12 +171,11 @@ namespace writer
         std::string generateFileName()
         {
             std::ostringstream name;
-            name << m_basename << '_' << m_timeStep << ".vtr";
+            name << m_basename << '_' << m_timeStep << ".vtu";
 
             return name.str();
         }
     };
 
 }
-
-#endif //SWE1D_GALERKINWRITER_H
+#endif //SWE1D_DGWRITER_H

@@ -8,15 +8,15 @@
 
 class LaxFriedrichsSolver{
 private:
-    T *m_h;
-    T *m_hu;
+    vect m_h;
+    vect m_hu;
 
-    T *m_hNetUpdatesLeft;
-    T *m_hNetUpdatesRight;
+    vect m_hNetUpdatesLeft;
+    vect m_hNetUpdatesRight;
 
 
-    T *m_huNetUpdatesLeft;
-    T *m_huNetUpdatesRight;
+    vect m_huNetUpdatesLeft;
+    vect m_huNetUpdatesRight;
 
     unsigned int m_size;
 
@@ -24,32 +24,28 @@ private:
 
     static constexpr double g = 9.80665;
 public:
-    T *a_h;
-    T *a_hu;
-    LaxFriedrichsSolver(T *h, T *hu, T *ah, T *ahu, unsigned int size, T cellSize)
+    vect a_h;
+    vect a_hu;
+    LaxFriedrichsSolver(vect h, vect hu, vect ah, vect ahu, unsigned int size, T cellSize)
     : m_h(h),
     m_hu(hu),
     a_h(ah),
     a_hu(ahu),
     m_size(size),
-    m_cellSize(cellSize)
+    m_cellSize(cellSize),
+    m_hNetUpdatesRight(size+2,0.0),
+    m_hNetUpdatesLeft(size+2,0.0),
+    m_huNetUpdatesRight(size+2,0.0),
+    m_huNetUpdatesLeft(size+2,0.0)
     {
-        // Allocate net updates
-        m_hNetUpdatesLeft = new T[size+1];
-        m_hNetUpdatesRight = new T[size+1];
-        m_huNetUpdatesLeft = new T[size+1];
-        m_huNetUpdatesRight = new T[size+1];
+
 
 
     }
 
     ~LaxFriedrichsSolver()
     {
-        // Free allocated memory
-        delete [] m_hNetUpdatesLeft;
-        delete [] m_hNetUpdatesRight;
-        delete [] m_huNetUpdatesLeft;
-        delete [] m_huNetUpdatesRight;
+
 
     }
     //Standard computation of fluxes and timestep
@@ -59,16 +55,17 @@ public:
     T computeLaxFriedrichsFlux2(T t);
 
     void updateUnknownsLaxFriedrichs(T dt);
-    void updateUnknownsLaxFriedrichs2(T dt);
+    vecu updateUnknownsLaxFriedrichs2(T dt);
     void updateUnknownsLaxFriedrichsDirect(T dt);
 
     T computeLocalLaxFriedrichsFlux(T t);
 
-    void updateUnknownsLocalLaxFriedrichs(T dt);
+    vecu updateUnknownsLocalLaxFriedrichs(T dt);
 
     void solveAnalytically(T dt);
 
 
+    vecu getAnalyticalSolution(T dt);
 };
 
 #endif //SWE1D_LAXFRIEDRICHSSOLVER_H

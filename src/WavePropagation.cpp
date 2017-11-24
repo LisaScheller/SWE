@@ -76,43 +76,65 @@ void WavePropagation::updateUnknownsUnstable(T dt){
     //Loop over all inner cells
     //Leveque S. 71
     for(unsigned int i = 1; i < m_size+1; i++){
-        m_h[i] += dt/2*m_cellSize*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]);
-        m_hu[i] += dt/2*m_cellSize*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]);
+        m_h.at(i) += dt/2*m_cellSize*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]);
+        m_hu.at(i) += dt/2*m_cellSize*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]);
     }
 }
 
-void WavePropagation::updateUnknownsLaxFriedrichs(T dt){
-  solver.updateUnknownsLocalLaxFriedrichs(dt);
+vecu WavePropagation::updateUnknownsLaxFriedrichs(T dt){
+   return solver.updateUnknownsLocalLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichsDirect(dt);
-    //solver.updateUnknownsLaxFriedrichs2(dt);
+    //return solver.updateUnknownsLaxFriedrichs2(dt);
     solver.solveAnalytically(dt);
 
+}
+
+vecu WavePropagation::updateAnalyticalSolution(T dt){
+    return solver.getAnalyticalSolution(dt);
 }
 
 void WavePropagation::updateUnknowns(T dt)
 {
 	// Loop over all inner cells
 	for (unsigned int i = 1; i < m_size+1; i++) {
-        m_h[i] -=  dt/m_cellSize * (m_hNetUpdatesRight[i-1] + m_hNetUpdatesLeft[i]);
-        m_hu[i] -= dt/m_cellSize * (m_huNetUpdatesRight[i-1] + m_huNetUpdatesLeft[i]);
+        m_h.at(i) -=  dt/m_cellSize * (m_hNetUpdatesRight.at(i-1) + m_hNetUpdatesLeft.at(i));
+        m_hu.at(i) -= dt/m_cellSize * (m_huNetUpdatesRight.at(i-1)+ m_huNetUpdatesLeft.at(i));
 	}
 }
 
 void WavePropagation::setOutflowBoundaryConditions()
 {
-	m_h[0] = m_h[1]; m_h[m_size+1] = m_h[m_size];
-	m_hu[0] = m_hu[1]; m_hu[m_size+1] = m_hu[m_size];
+	m_h.at(0) = m_h.at(1); m_h.at(m_size+1) = m_h.at(m_size);
+	m_hu.at(0) = m_hu.at(1); m_hu.at(m_size+1) = m_hu.at(m_size);
 }
 
 T WavePropagation::computeError() {
     T res = 0.0;
     for (int i = 0; i<m_size+1; i++){
         //res += sqrtf((std::abs(m_cellSize*(m_h[i]-solver.a_h[i]))*std::abs(m_cellSize*(m_h[i]-solver.a_h[i])))+(std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))*std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))));
-        res += std::abs((m_cellSize*(m_h[i]-solver.a_h[i]))*std::abs(m_cellSize*(m_h[i]-solver.a_h[i])))+(std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]))*std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i])));
+        res += std::abs((m_cellSize*(m_h.at(i)-solver.a_h.at(i)))*std::abs(m_cellSize*(m_h.at(i)-solver.a_h.at(i))))+(std::abs(m_cellSize*(m_hu.at(i)-solver.a_hu.at(i)))*std::abs(m_cellSize*(m_hu.at(i)-solver.a_hu.at(i))));
         //res += std::abs(m_cellSize*(m_h[i]-solver.a_h[i]))+std::abs(m_cellSize*(m_hu[i]-solver.a_hu[i]));
     }
     return sqrt(res);
+}
+
+vect WavePropagation::getExactSolutionH(T t){
+    vect res(m_size+2);
+    vecu sol = solver.getAnalyticalSolution(t);
+    for(int i = 0; i<m_size+2; i++){
+        res.at(i) = sol.at(i).u0;
+    }
+    return res;
+}
+
+vect WavePropagation::getExactSolutionHu(T t){
+    vect res(m_size+2);
+    vecu sol = solver.getAnalyticalSolution(t);
+    for(int i = 0; i<m_size+2; i++){
+        res.at(i) = sol.at(i).u1;
+    }
+    return res;
 }
 
 

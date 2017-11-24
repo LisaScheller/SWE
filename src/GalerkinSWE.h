@@ -36,14 +36,14 @@ private:
     double g = 9.80665;
 
 public:
-    GalerkinSWE(vecq q, unsigned int size, unsigned int cellsize):
+    GalerkinSWE(vecq q, unsigned int size, T cellsize):
             m_size(size),
             m_q(q.size()),
             m_qt(q.size()),
-            m_hNetUpdatesRight(size,0.0),
-            m_hNetUpdatesLeft(size,0.0),
-            m_huNetUpdatesRight(size,0.0),
-            m_huNetUpdatesLeft(size,0.0),
+            m_hNetUpdatesRight(size+2,0.0),
+            m_hNetUpdatesLeft(size+2,0.0),
+            m_huNetUpdatesRight(size+2,0.0),
+            m_huNetUpdatesLeft(size+2                                                                                                                                                                             ,0.0),
             m_cellSize(cellsize),
             s(4),
             m(4),

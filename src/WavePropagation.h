@@ -74,15 +74,15 @@
 class WavePropagation
 {
 private:
-	T *m_h;
-	T *m_hu;
+	vect m_h;
+	vect m_hu;
 
-	T *m_hNetUpdatesLeft;
-	T *m_hNetUpdatesRight;
+	vect m_hNetUpdatesLeft;
+	vect m_hNetUpdatesRight;
 
 
-	T *m_huNetUpdatesLeft;
-	T *m_huNetUpdatesRight;
+	vect m_huNetUpdatesLeft;
+	vect m_huNetUpdatesRight;
 
 	unsigned int m_size;
 
@@ -98,28 +98,24 @@ private:
 	 * @param cellSize Size of one cell
 	 */
 public:
-    WavePropagation(T *h, T *hu, T *ah, T *ahu, unsigned int size, T cellSize)
+    WavePropagation(vect h, vect hu, vect ah, vect ahu, unsigned int size, T cellSize)
 		: m_h(h),
 		  m_hu(hu),
 		  m_size(size),
 		  m_cellSize(cellSize),
+		  m_hNetUpdatesLeft(size+2,0.0),
+		  m_hNetUpdatesRight(size+2,0.0),
+		  m_huNetUpdatesLeft(size+2, 0.0),
+		  m_huNetUpdatesRight(size+2, 0.0),
           solver (h, hu, ah, ahu, size, cellSize)
 	{
-		// Allocate net updates
-		m_hNetUpdatesLeft = new T[size+1];
-		m_hNetUpdatesRight = new T[size+1];
-		m_huNetUpdatesLeft = new T[size+1];
-		m_huNetUpdatesRight = new T[size+1];
+
 
 	}
 
 	~WavePropagation()
 	{
-		// Free allocated memory
-		delete [] m_hNetUpdatesLeft;
-		delete [] m_hNetUpdatesRight;
-		delete [] m_huNetUpdatesLeft;
-		delete [] m_huNetUpdatesRight;
+
 
 	}
 
@@ -149,13 +145,21 @@ public:
 
     void updateUnknownsUnstable(T dt);
 
-    void updateUnknownsLaxFriedrichs(T dt);
+    vecu updateUnknownsLaxFriedrichs(T dt);
 
     T computeError();
 
     LaxFriedrichsSolver solver;
 
     T computeErrorHU();
+
+	vect getExactSolution(T t);
+
+	vect getExactSolutionH(T t);
+
+	vect getExactSolutionHu(T t);
+
+    vecu updateAnalyticalSolution(T dt);
 };
 
 

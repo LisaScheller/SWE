@@ -221,7 +221,6 @@ vect NodalAdvection::getExactSolution(T t, int numberOfIntervals){
     //Attention: Only works for specific size and function as defined in AdvectionGalerkin.h at the moment
     T delta_x = 100.0/numberOfIntervals;
 
-
     double sigma = 10.0;//3.0;
     for (unsigned int pos = 0; pos <m_size+2; pos++){
         int x0 = 50;
@@ -231,18 +230,6 @@ vect NodalAdvection::getExactSolution(T t, int numberOfIntervals){
         res.at(pos) = 10*res.at(pos)+0.1;
     }
     return res;
-}
-
-T NodalAdvection::getXOfMax(){
-    T x = -1.0;
-    T max = 0.0;
-    for (unsigned int i = 0; i<m_size+2; i++){
-        if (m_u.at(i).u0>max){
-            max = m_u.at(i).u0;
-            x = (double) i;
-        }
-    }
-    return x*m_cellSize;
 }
 
 T NodalAdvection::computeError(vecu h0) {

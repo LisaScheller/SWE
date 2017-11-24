@@ -28,20 +28,24 @@ namespace scenarios
         /**
          * @return Initial water height at pos
          */
-        double getHeight(unsigned int pos)
+        T getHeight(unsigned int i)
         {
+            T delta_x = getCellSize();
+            //Compute x-value from interval number
+            T pos = delta_x*i;
+            T posr = delta_x *(i+1);
             //Gaussian distribution with standard deviation 50/3 and expected value at m_size/2
             //Maximum (height 1) at m_size/2
 
             //Standard deviation
-            double sigma = 10.0/3.0;
+            double sigma = 10.0;
             //Get relative position in relation to m_size/2
-            int x0 = m_size/2;
+            int x0 = 50;
             int x = pos - x0;
-            double h = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma))*0.01;
+            double h = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(x/sigma)*(x/sigma));
             //Observation: With this height distribution a left-going and a right-going wave can be observed
             //But: Height of starting wave is relatively big in comparison to water depth
-            return 10.0f*h + 0.1f;
+            return 10.0*h + 0.1;
         }
 
         /**
@@ -49,7 +53,7 @@ namespace scenarios
          */
         T getCellSize()
         {
-            return 100.f / m_size;
+            return 100.0 / m_size;
         }
     };
 
