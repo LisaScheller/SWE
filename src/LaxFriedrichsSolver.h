@@ -66,6 +66,10 @@ public:
 
 
     vecu getAnalyticalSolution(T dt);
+
+    T computeUnstableFlux(T t);
+
+    vecu updateUnknownsUnstable(T dt);
 };
 
 #endif //SWE1D_LAXFRIEDRICHSSOLVER_H

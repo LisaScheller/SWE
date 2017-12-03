@@ -10,6 +10,43 @@
 #include "algorithm"
 
 T tPrev = 0;
+T LaxFriedrichsSolver::computeUnstableFlux(T t){
+    T maxWaveSpeed = 0.0;
+    T deltaT = t - tPrev;
+    tPrev = t;
+    //Loop over all edges
+    for (unsigned int i = 1; i<m_size+1; i++){
+        T maxEdgeSpeed;
+
+        // Compute net updates (1-dim SWE, Leveque S. 255)
+        m_hNetUpdatesLeft.at(i) = (0.5*(m_hu.at(i-1)+m_hu.at(i)));
+        m_hNetUpdatesRight.at(i) = (0.5*(m_hu.at(i)+m_hu.at(i+1)));
+        T fQLeft = ((m_hu.at(i-1)*m_hu.at(i-1))/m_h.at(i-1))+(0.5*g*(m_h.at(i-1)*m_h.at(i-1)));
+        T fQMiddle = ((m_hu.at(i)*m_hu.at(i))/m_h.at(i))+(0.5*g*(m_h.at(i)*m_h.at(i)));
+        T fQRight = ((m_hu.at(i+1)*m_hu.at(i+1))/m_h.at(i+1))+(0.5*g*(m_h.at(i+1)*m_h.at(i+1)));
+        m_huNetUpdatesLeft.at(i) = (0.5*(fQLeft+fQMiddle));
+        m_huNetUpdatesRight.at(i) = (0.5*(fQMiddle+fQRight));
+
+
+        //Compute edge speed
+        if(m_hu.at(i-1) < 0.0){
+            maxEdgeSpeed= -m_hu.at(i-1)+std::sqrt(g)*m_h.at(i-1);
+        }else{
+            maxEdgeSpeed=  m_hu.at(i-1)+std::sqrt(g)*m_h.at(i-1);
+        }
+
+        // Update maxWaveSpeed
+        if (maxEdgeSpeed > maxWaveSpeed)
+            maxWaveSpeed = maxEdgeSpeed;
+    }
+
+
+    // Compute CFL condition (with Courant number 0.4)
+
+    T maxTimeStep = m_cellSize/maxWaveSpeed * .4;
+
+    return maxTimeStep;
+}
 T LaxFriedrichsSolver::computeLaxFriedrichsFlux() {
     T maxWaveSpeed = 0.0;
     //Loop over all edges
@@ -66,10 +103,11 @@ T LaxFriedrichsSolver::computeLaxFriedrichsFlux2(T t) {
     maxWaveSpeed = std::max(std::max(maxWaveSpeed, aLeft),aRight);
 	//maxWaveSpeed = std::max(std::max(maxWaveSpeed,aLeft),aRight);
 
+
     }
     // Compute CFL condition (with Courant number 0.4)
 
-    T maxTimeStep = m_cellSize/maxWaveSpeed * .4;
+    T maxTimeStep = m_cellSize/maxWaveSpeed * 0.04;
 
     return maxTimeStep;
 }
@@ -80,9 +118,7 @@ T LaxFriedrichsSolver::computeLocalLaxFriedrichsFlux(T t){
     tPrev = t;
     //Loop over all edges
     for (unsigned int i = 1; i<m_size+1; i++){
-        if (i == 49){
-            int o = 3;
-        }
+
         //Factor a for local Lax Friedrichs Method (aLeft = a_i-1/2, aRight = a_i+1/2
         T aLeft;
         T aRight;
@@ -120,6 +156,19 @@ void LaxFriedrichsSolver::updateUnknownsLaxFriedrichs(T dt){
 
 }
 
+vecu LaxFriedrichsSolver::updateUnknownsUnstable(T dt){
+    //Loop over all inner cells
+    //Leveque S. 71
+    vecu res(m_size+2);
+    for(unsigned int i = 1; i < m_size+1; i++){
+        m_h.at(i) = m_h.at(i) - ((dt/2*m_cellSize)*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]));
+        m_hu.at(i) = m_hu.at(i) - ((dt/2*m_cellSize)*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]));
+        res.at(i).u0 = m_h.at(i);
+        res.at(i).u1 = m_hu.at(i);
+    }
+    return res;
+}
+
 vecu LaxFriedrichsSolver::updateUnknownsLaxFriedrichs2(T dt){
     //Alternative method using a combination of formula 4.21 (Leveque p. 71) for the fluxes
     //and formulas 4.6 and 4.7 (Leveque p. 66) to compute h and hu
@@ -142,9 +191,6 @@ vecu LaxFriedrichsSolver::updateUnknownsLaxFriedrichs2(T dt){
 vecu LaxFriedrichsSolver::updateUnknownsLocalLaxFriedrichs(T dt){
     vecu res(m_size+2);
     for (unsigned int i = 1; i < m_size+1; i++){
-        if (i==50){
-            int y = 3;
-        }
         m_h.at(i) = m_h.at(i) - ((dt/m_cellSize)*(m_hNetUpdatesRight.at(i)-m_hNetUpdatesLeft.at(i)));
         m_hu.at(i) = m_hu.at(i) - ((dt/m_cellSize)*(m_huNetUpdatesRight.at(i)-m_huNetUpdatesLeft.at(i)));
         res.at(i).u0 = m_h.at(i);

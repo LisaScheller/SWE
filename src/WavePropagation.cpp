@@ -72,13 +72,15 @@ T WavePropagation::computeLaxFriedrichsFlux(T t) {
 
 }
 
-void WavePropagation::updateUnknownsUnstable(T dt){
-    //Loop over all inner cells
-    //Leveque S. 71
-    for(unsigned int i = 1; i < m_size+1; i++){
-        m_h.at(i) += dt/2*m_cellSize*(m_hNetUpdatesRight[i]-m_hNetUpdatesLeft[i]);
-        m_hu.at(i) += dt/2*m_cellSize*(m_huNetUpdatesRight[i]-m_huNetUpdatesLeft[i]);
-    }
+T WavePropagation::computeUnstableFlux(T t) {
+    return solver.computeUnstableFlux(t);
+}
+
+
+
+vecu WavePropagation::updateUnknownsUnstable(T dt){
+    return solver.updateUnknownsUnstable(dt);
+
 }
 
 vecu WavePropagation::updateUnknownsLaxFriedrichs(T dt){

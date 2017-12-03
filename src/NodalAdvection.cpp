@@ -236,8 +236,9 @@ T NodalAdvection::computeError(vecu h0) {
     T res = 0.0;
     for(unsigned int i = 1; i<m_size+1; i++){
         res += std::abs((m_u.at(i).u0 - h0.at(i).u0)*(m_u.at(i).u0 - h0.at(i).u0));
+        res += std::abs((m_u.at(i).u1 - h0.at(i).u1)*(m_u.at(i).u1 - h0.at(i).u1));
     }
-    return std::sqrt(res);
+    return std::sqrt(m_cellSize*res);
 }
 
 

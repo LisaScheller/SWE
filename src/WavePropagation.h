@@ -143,7 +143,7 @@ public:
 	 */
 	void setOutflowBoundaryConditions();
 
-    void updateUnknownsUnstable(T dt);
+    vecu updateUnknownsUnstable(T dt);
 
     vecu updateUnknownsLaxFriedrichs(T dt);
 
@@ -160,6 +160,9 @@ public:
 	vect getExactSolutionHu(T t);
 
     vecu updateAnalyticalSolution(T dt);
+
+    T computeUnstableFlux(T t);
+
 };
 
 

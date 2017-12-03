@@ -48,6 +48,7 @@
 #include "writer/DGWriter.h"
 #include "scenarios/SWEGalerkin.h"
 #include "GalerkinSWE.h"
+#include "AdvectionFiniteVolumes.h"
 
 #include <cstring>
 
@@ -57,13 +58,14 @@ int main(int argc, char** argv)
     //Choose which scenarios or solvers you want to use
     bool dambreak = false;
     bool gauss = false;
-    bool AdvDG = false;
+    bool Adv = false;
+    bool AdvDG = true;
     bool SWE = false;
-    bool SWEDG = true;
+    bool SWEDG = false;
     bool SWEDGGauss = false;
 
     //Choose between normal mode and error computing (no vtk output while error computing)
-    bool errorComputing = false;
+    bool errorComputing = true;
 
 	// Parse command line parameters
 	tools::Args args(argc, argv);
@@ -87,6 +89,11 @@ int main(int argc, char** argv)
     vect ahFV(numberOfIntervals+2, 0.0);
     vect ahuFV(numberOfIntervals+2, 0.0);
 
+    //Advection finite volumes
+    vect u(numberOfIntervals+2, 0.0);
+    vect uu(numberOfIntervals+2, 0.0);
+    vect u0(numberOfIntervals+2, 0.0);
+
     //Advection equation DG
     vecu h(numberOfIntervals+2);
     vecu hu(numberOfIntervals+2);
@@ -105,12 +112,18 @@ int main(int argc, char** argv)
         for (unsigned int i = 0; i < numberOfIntervals + 2; i++) {
             hFV.at(i) = scDambreak.getHeight(i);
             ahFV.at(i) = scDambreak.getHeight(i);
+            //huFV.at(i) = scDambreak.getU(i);
         }
     }
     else if (SWE && gauss){
         for (unsigned int i = 0; i < numberOfIntervals + 2; i++) {
             hFV.at(i) = scGauss.getHeight(i);
             ahFV.at(i) = scGauss.getHeight(i);
+        }
+    }
+    if (Adv){
+        for (unsigned int i = 0; i < numberOfIntervals + 2; i++) {
+            u.at(i) = scGauss.getHeight(i);
         }
     }
     if (AdvDG){
@@ -140,6 +153,7 @@ int main(int argc, char** argv)
     writer::VtkWriter writerG("SWE1DGauss", scGauss.getCellSize());
     writer::VtkWriter writer("swe1d", scDambreak.getCellSize());
     writer::VtkWriter analyticWriter("analytic", scDambreak.getCellSize());
+    writer::VtkWriter advWriter("Adv", scGauss.getCellSize());
     writer::DGWriter dgWriter("AdvDG", scAdvDG.getCellSize());
     writer::DGWriter analyticalAdvWriter("AdvDGAnalytic", scAdvDG.getCellSize());
     writer::DGWriter writerSWEG("SWEDGGauss", scSWEDG.getCellSize());
@@ -147,8 +161,8 @@ int main(int argc, char** argv)
 
     // Helper classes for computing the wave propagation and computing the solutions
 	WavePropagation wavePropagation(hFV, huFV, ahFV, ahuFV, numberOfIntervals, scDambreak.getCellSize());
+    AdvectionFiniteVolumes advection(a, u, numberOfIntervals, scGauss.getCellSize());
     NodalAdvection nodalAdvection(a,h,numberOfIntervals,scAdvDG.getCellSize());
-    T test = scSWEDG.getCellSize();
     GalerkinSWE galerkin(q,numberOfIntervals,scSWEDG.getCellSize());
 
 	// Write initial data
@@ -160,11 +174,13 @@ int main(int argc, char** argv)
     if (!errorComputing) {
         if (SWE && dambreak) {
             writer.write(t, hFV, huFV, numberOfIntervals);
-            if (errorComputing) {
-                analyticWriter.write(t, ahFV, ahuFV, numberOfIntervals);
-            }
+            analyticWriter.write(t, ahFV, ahuFV, numberOfIntervals);
+
         } else if (SWE && gauss) {
             writerG.write(t, hFV, huFV, numberOfIntervals);
+        }
+        if (Adv){
+            advWriter.write(t, u, uu, numberOfIntervals);
         }
         if (AdvDG) {
             dgWriter.write(t, qAdv, numberOfIntervals);
@@ -189,6 +205,7 @@ int main(int argc, char** argv)
     T tRound = 100/std::abs(a);
     //Save starting conditions
     vecu h0 = h;
+    u0 = u;
     //Initalize variables for calculation of number of timesteps
     T timestepsize = 0.0;
     int iRound = 0;
@@ -212,6 +229,7 @@ int main(int argc, char** argv)
 
             // Compute numerical flux on each edge
             T maxTimeStep = wavePropagation.computeLaxFriedrichsFlux(t);
+            //T maxTimeStep = wavePropagation.computeUnstableFlux(t);
 
             if (t <= errorTime && errorComputing){
                 maxTimeSteps  = i + 10;
@@ -221,6 +239,7 @@ int main(int argc, char** argv)
             }
             // Update unknowns from net updates (Choose between Lax-Friedrichs and Local Lax Friedrichs in WavePropagation.cpp)
             vecu res = wavePropagation.updateUnknownsLaxFriedrichs(maxTimeStep);
+            //vecu res = wavePropagation.updateUnknownsUnstable(maxTimeStep);
 
             for (unsigned int j = 0; j<numberOfIntervals+2; j++){
                 hFV.at(j) = res.at(j).u0;
@@ -228,13 +247,12 @@ int main(int argc, char** argv)
             }
 
             //Save values of analytic solution if error shall be computed
-            if (errorComputing){
-                vecu resA = wavePropagation.updateAnalyticalSolution(maxTimeStep);
-                for (unsigned int j = 0; j<numberOfIntervals+2; j++){
-                    ahFV.at(j) = resA.at(j).u0;
-                    ahuFV.at(j) = resA.at(j).u1;
+            vecu resA = wavePropagation.updateAnalyticalSolution(maxTimeStep);
+            for (unsigned int j = 0; j<numberOfIntervals+2; j++){
+                ahFV.at(j) = resA.at(j).u0;
+                ahuFV.at(j) = resA.at(j).u1;
                 }
-            }
+
 
             // Update time
             t += maxTimeStep;
@@ -273,13 +291,44 @@ int main(int argc, char** argv)
                     writerG.write(t, hFV, huFV, numberOfIntervals);
                 } else if (dambreak) {
                     writer.write(t, hFV, huFV, numberOfIntervals);
-                    if (errorComputing) {
-                        analyticWriter.write(t, ahFV, ahuFV, numberOfIntervals);
-                    }
+                    analyticWriter.write(t, ahFV, ahuFV, numberOfIntervals);
+
                 }
             }
         }
 
+        if (Adv){
+            if (iRound > 0 && i == iRound+1){
+                error = advection.computeError(u0);
+            }
+
+            //Update boundaries
+            advection.setBoundaryConditions();
+
+            //Compute numerical flux on each edge
+            T advFVTimeStep = advection.computeLocalLaxFriedrichsFlux(t);
+
+            if (i == 0 && errorComputing){
+                timestepsize = advFVTimeStep;
+                iRound = ((int)tRound/timestepsize)+1;
+                maxTimeSteps = iRound + 10;
+            }
+
+            advection.updateUnknownsLocalLaxFriedrichs(advFVTimeStep);
+
+            t+= advFVTimeStep;
+
+            vect tmp = advection.setU();
+            for (unsigned int j = 0; j<numberOfIntervals+2; j++){
+                u.at(j) = tmp.at(j);
+            }
+
+            //Write values to vtk
+            if(!errorComputing){
+                advWriter.write(t, u, uu, numberOfIntervals);
+            }
+
+        }
         if (AdvDG){
             if (iRound > 0 && i == iRound+1){
                 error = nodalAdvection.computeError(h0);
@@ -346,10 +395,10 @@ int main(int argc, char** argv)
             // Write new values
             q = galerkin.setQ();
             if (!errorComputing) {
-                if (SWEDG) {
-                    writerSWEDG.write(t, q, numberOfIntervals);
-                } else if (SWEDGGauss) {
+                if (SWEDGGauss) {
                     writerSWEG.write(t, q, numberOfIntervals);
+                } else{
+                    writerSWEDG.write(t, q, numberOfIntervals);
                 }
             }
         }
@@ -358,6 +407,9 @@ int main(int argc, char** argv)
         std::cout << "Error at time approx. 0.5s is " << error <<std::endl;
     }
     if (errorComputing && AdvDG){
+        std::cout << "Error after one circle is " << error << std::endl;
+    }
+    if (errorComputing && Adv){
         std::cout << "Error after one circle is " << error << std::endl;
     }
 

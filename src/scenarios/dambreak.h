@@ -72,6 +72,14 @@ public:
 	{
 		return 100.0 / m_size;
 	}
+
+    T getU(unsigned int i) {
+        T pos = i*getCellSize();
+        if (pos <= 50.0)
+            return -2;
+
+        return 2;
+    }
 };
 
 }
