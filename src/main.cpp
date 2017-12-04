@@ -59,13 +59,16 @@ int main(int argc, char** argv)
     bool dambreak = false;
     bool gauss = false;
     bool Adv = false;
-    bool AdvDG = true;
+    bool AdvDG = false;
     bool SWE = false;
-    bool SWEDG = false;
+    bool SWEDG = true;
     bool SWEDGGauss = false;
 
     //Choose between normal mode and error computing (no vtk output while error computing)
-    bool errorComputing = true;
+    bool errorComputing = false;
+
+    //Choose between explicit euler and midpoint explicit euler
+    bool improvedEuler = false;
 
 	// Parse command line parameters
 	tools::Args args(argc, argv);
@@ -105,6 +108,7 @@ int main(int argc, char** argv)
 
     //SWE DG
     vecq q(numberOfIntervals+2);
+    vecq aq(numberOfIntervals+2);
 
 
 	// Initialize water height and momentum
@@ -213,6 +217,8 @@ int main(int argc, char** argv)
 
     //Variable for computing the number of timesteps until a certain time is reached (for error computing)
     T errorTime = 0.5;
+    T eH  = 0.0;
+    T eHu = 0.0;
     T timestep = 0.0;
     T neededTime = 0.0;
     int iNeeded = 0;
@@ -260,28 +266,30 @@ int main(int argc, char** argv)
             if (errorComputing){
                 //Compute difference between exact solution and numerical method at errorTime
                 if (t>=errorTime && std::abs(t-errorTime)<maxTimeStep) {
-                    ahFV = wavePropagation.getExactSolutionH(t);
-                    ahuFV = wavePropagation.getExactSolutionHu(t);
+                    //ahFV = wavePropagation.getExactSolutionH(t);
+                    //ahuFV = wavePropagation.getExactSolutionHu(t);
                     T deltaH = 0.0;
                     T deltaHu = 0.0;
                     T errorAtI = 0.0;
                     vect errH(numberOfIntervals+2, 0.0);
                     vect  errHu(numberOfIntervals+2, 0.0);
-                    T eH  = 0.0;
-                    T eHu = 0.0;
+
                     for (unsigned int i = 1; i < numberOfIntervals + 1; i++) {
                         deltaH = std::abs(hFV.at(i) - ahFV.at(i));
                         deltaHu = std::abs(huFV.at(i) - ahuFV.at(i));
-                        errorAtI = deltaH+deltaHu;
-                        errH.at(i) = deltaH;
-                        errHu.at(i) = deltaHu;
+                        errH.at(i) = deltaH*deltaH;
+                        errHu.at(i) = deltaHu*deltaHu;
+                        eH += errH.at(i);
+                        eHu += errHu.at(i);
+                        //errorAtI = errH.at(i)+errHu.at(i);
+                        //error += errorAtI;
                     }
-                    //Variante 1 Betrag der Vektoren als ganzes
-                    for (int j = 1; j< numberOfIntervals+1; j++){
-                        eH += errH.at(j);
-                        eHu += errHu.at(j);
-                    }
-                    error = scDambreak.getCellSize()*(eH+eHu);
+                    eH = std::sqrt(scDambreak.getCellSize()*eH);
+                    eHu = std::sqrt(scDambreak.getCellSize()*eHu);
+                    error = eH+eHu;
+                    //error = eH + eHu;
+                    //error = std::sqrt(scDambreak.getCellSize()*eH);
+                    //error = std::sqrt(scDambreak.getCellSize()*error);
                 }
             }
 
@@ -349,6 +357,13 @@ int main(int argc, char** argv)
             //Compute time derivative of u
             nodalAdvection.computeTimeDerivative();
 
+            if (improvedEuler){
+                nodalAdvection.computeHalfEulerStep(advTimeStep);
+                nodalAdvection.setBoundaryConditions();
+                nodalAdvection.computeLocalLaxFriedrichsFluxes(t+(0.5*advTimeStep));
+                nodalAdvection.computeTimeDerivative();
+            }
+
             //Compute the euler integration step
             nodalAdvection.computeEulerStep(advTimeStep);
 
@@ -383,11 +398,61 @@ int main(int argc, char** argv)
             // Compute numerical flux on each edge
             T galTimeStep = galerkin.computeLocalLaxFriedrichsFluxes(t);
 
+            if (t <= errorTime && errorComputing){
+                maxTimeSteps  = i + 10;
+            }
+            else if (t > errorTime && errorComputing){
+                maxTimeSteps = i;
+            }
+
             //Compute time derivative of h and hu
             galerkin.computeTimeDerivative();
 
+            if (improvedEuler){
+                galerkin.computeHalfEulerStep(galTimeStep);
+                galerkin.setBoundaryConditions();
+                galerkin.computeLocalLaxFriedrichsFluxes(t+(0.5*galTimeStep));
+                galerkin.computeTimeDerivative();
+            }
+
             //Compute Euler integration step
             galerkin.computeEulerStep(galTimeStep);
+
+            //Save values of analytic solution if error shall be computed
+            vecq resA = galerkin.getAnalyticalSolution(galTimeStep);
+            for (unsigned int j = 0; j<numberOfIntervals+2; j++){
+                aq.at(j).h = resA.at(j).h;
+                aq.at(j).hu = resA.at(j).hu;
+            }
+
+            if (errorComputing){
+                //Compute difference between exact solution and numerical method at errorTime
+                if (t>0.0 && t>=errorTime && std::abs(t-errorTime)<galTimeStep) {
+
+                    T deltaH0 = 0.0;
+                    T deltaH1 = 0.0;
+                    T deltaHu0 = 0.0;
+                    T deltaHu1 = 0.0;
+
+                    vect errH(numberOfIntervals+2, 0.0);
+                    vect  errHu(numberOfIntervals+2, 0.0);
+                    
+                    for (unsigned int i = 1; i < numberOfIntervals + 1; i++) {
+                        deltaH0 = std::abs(q.at(i).h.u0 - aq.at(i).h.u0);
+                        deltaH1 = std::abs(q.at(i).h.u1 - aq.at(i).h.u1);
+                        errH.at(i) = (deltaH0*deltaH0) + (deltaH1*deltaH1);
+                        deltaHu0 = std::abs(q.at(i).hu.u0 - aq.at(i).hu.u0);
+                        deltaHu1 = std::abs(q.at(i).hu.u1 - aq.at(i).hu.u1);
+                        errHu.at(i) = (deltaHu0*deltaHu0) + (deltaHu1*deltaHu1);
+                        eH += errH.at(i);
+                        eHu += errHu.at(i);
+
+                    }
+                    eH = std::sqrt(scDambreak.getCellSize()*eH);
+                    eHu = std::sqrt(scDambreak.getCellSize()*eHu);
+                    error = eH+eHu;
+                }
+            }
 
             // Update time
             t += galTimeStep;
@@ -404,6 +469,13 @@ int main(int argc, char** argv)
         }
     }
     if (errorComputing && SWE && dambreak){
+        std::cout << "Error of h at time approx. 0.5s is " << eH <<std::endl;
+        std::cout << "Error of hu at time approx. 0.5s is " << eHu <<std::endl;
+        std::cout << "Error at time approx. 0.5s is " << error <<std::endl;
+    }
+    if (errorComputing && SWEDG){
+        std::cout << "Error of h at time approx. 0.5s is " << eH <<std::endl;
+        std::cout << "Error of hu at time approx. 0.5s is " << eHu <<std::endl;
         std::cout << "Error at time approx. 0.5s is " << error <<std::endl;
     }
     if (errorComputing && AdvDG){

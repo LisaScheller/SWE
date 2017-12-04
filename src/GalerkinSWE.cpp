@@ -241,19 +241,22 @@ void GalerkinSWE::computeEulerStep(T delta_t){
     q0.hu.u1 = 0.0;
     vecq tmp(m_size+2,q0);
     for(unsigned int i = 0; i<m_size+2; i++){
-        if (i==49){
-            int o = 0;
-        }
-        tmp.at(i).h.u0 = m_q.at(i).h.u0 + (delta_t*m_qt.at(i).h.u0);
-        tmp.at(i).h.u1 = m_q.at(i).h.u1 + (delta_t*m_qt.at(i).h.u1);
-        tmp.at(i).hu.u0=m_q.at(i).hu.u0+(delta_t*m_qt.at(i).hu.u0);
-        tmp.at(i).hu.u1=m_q.at(i).hu.u1+(delta_t*m_qt.at(i).hu.u1);
+
+        tmp.at(i).h.u0 = m_q_bef.at(i).h.u0 + (delta_t*m_qt.at(i).h.u0);
+        tmp.at(i).h.u1 = m_q_bef.at(i).h.u1 + (delta_t*m_qt.at(i).h.u1);
+        tmp.at(i).hu.u0=m_q_bef.at(i).hu.u0+(delta_t*m_qt.at(i).hu.u0);
+        tmp.at(i).hu.u1=m_q_bef.at(i).hu.u1+(delta_t*m_qt.at(i).hu.u1);
     }
     for(unsigned int j = 0; j<m_size+2; j++){
         m_q.at(j).h.u0 = tmp.at(j).h.u0;
         m_q.at(j).hu.u0 = tmp.at(j).hu.u0;
         m_q.at(j).h.u1 = tmp.at(j).h.u1;
         m_q.at(j).hu.u1 = tmp.at(j).hu.u1;
+
+        m_q_bef.at(j).h.u0 = tmp.at(j).h.u0;
+        m_q_bef.at(j).hu.u0 = tmp.at(j).hu.u0;
+        m_q_bef.at(j).h.u1 = tmp.at(j).h.u1;
+        m_q_bef.at(j).hu.u1 = tmp.at(j).hu.u1;
     }
     /*for (unsigned int j = 0; j<m_size+2; j++) {
         if (tmp.at(j).u0 > 0.1 && tmp.at(j).u1 > 0.1) {
@@ -286,5 +289,103 @@ vecq GalerkinSWE::setQ(){
         result.at(i) = m_q.at(i);
     }
     return result;
+}
+
+vecq GalerkinSWE::getAnalyticalSolution(T dt){
+    //Values for specific case h_l=11, h_r=10, u_l=u_r=0
+    //Computed with maple
+    T t = t0 +dt;
+
+    T h_l=3.0;
+    T u_l=0.0;
+    T h_r=1.0;
+    T u_r=0.0;
+    /*T s=10.26901816;
+    T u_m=0.48339953;
+    T h_m=10.49398975;*/
+    T u_m=2.332542824;
+    T h_m=1.848576603;
+    T c_m=std::sqrt(g*h_m);
+    T lambda_1_l=u_l-sqrt(g*h_l);
+    T lambda_1_m=u_m-sqrt(g*h_m);
+    T factor = m_size/100.0;
+    T c1 = std::sqrt(g*h_l);
+    T a = -5.423991150;
+    T b = -1.92517691;
+    T s = 5.081313902;
+    for (unsigned int i =0; i<m_size+2; i++){
+
+        T x = (i/factor) - 50.0;
+        T xr = ((i+1)/factor) - 50.0;
+        T sigma = x/t;
+        T sigmar = xr/t;
+        if (sigma <= a){
+            aq.at(i).h.u0 = h_l;
+            aq.at(i).hu.u0 = aq.at(i).h.u0*u_l;
+        }
+        else if (sigma > a && sigma <= b){
+            aq.at(i).h.u0=(4/(9*g))*((c1-(sigma/2))*(c1-(sigma/2)));
+            aq.at(i).hu.u0=aq.at(i).h.u0*((2/3)*(sigma+c1));
+
+        }
+        else if (sigma>b && sigma <= s){
+            aq.at(i).h.u0 = h_m;
+            aq.at(i).hu.u0 = aq.at(i).h.u0*(2*(c1-c_m));
+        }
+        else if (sigma>s){//1.012274368){
+            aq.at(i).h.u0 = h_r;
+            aq.at(i).hu.u0 = aq.at(i).h.u0*u_r;
+        }
+
+        if (sigmar <= a){
+            aq.at(i).h.u1 = h_l;
+            aq.at(i).hu.u1 = aq.at(i).h.u1*u_l;
+        }
+        else if (sigmar > a && sigmar <= b){
+            aq.at(i).h.u1=(4/(9*g))*((c1-(sigmar/2))*(c1-(sigmar/2)));
+            aq.at(i).hu.u1=aq.at(i).h.u1*((2/3)*(sigmar+c1));
+
+        }
+        else if (sigmar>b && sigmar <= s){
+            aq.at(i).h.u1 = h_m;
+            aq.at(i).hu.u1 = aq.at(i).h.u1*(2*(c1-c_m));
+        }
+        else if (sigmar>s){//1.012274368){
+            aq.at(i).h.u1 = h_r;
+            aq.at(i).hu.u1 = aq.at(i).h.u1*u_r;
+        }
+    }
+    aq.at(m_size+1).h.u0 = aq.at(m_size).h.u0;
+    aq.at(m_size+1).hu.u0 = aq.at(m_size).hu.u0;
+    aq.at(m_size+1).h.u1 = aq.at(m_size).h.u1;
+    aq.at(m_size+1).hu.u1 = aq.at(m_size).hu.u1;
+    vecq res(m_size+2);
+    for(unsigned int j = 0; j < m_size+2; j++){
+        res.at(j).h = aq.at(j).h;
+        res.at(j).hu = aq.at(j).hu;
+    }
+    return res;
+}
+
+void GalerkinSWE::computeHalfEulerStep(T delta_t){
+    u u0;
+    u0.u0 = 0.0;
+    u0.u1 = 0.0;
+    q q0;
+    q0.h = u0;
+    q0.hu = u0;
+    vecq tmp(m_size+2,q0);
+    for(unsigned int i = 0; i<m_size+2; i++){
+        tmp.at(i).h.u0=m_q.at(i).h.u0+((0.5*delta_t)*m_qt.at(i).h.u0);
+        tmp.at(i).h.u1=m_q.at(i).h.u1+((0.5*delta_t)*m_qt.at(i).h.u1);
+        tmp.at(i).hu.u0=m_q.at(i).hu.u0+((0.5*delta_t)*m_qt.at(i).hu.u0);
+        tmp.at(i).hu.u1=m_q.at(i).hu.u1+((0.5*delta_t)*m_qt.at(i).hu.u1);
+    }
+    for (unsigned int j = 0; j < m_size+2; j++){
+        m_q.at(j).h = tmp.at(j).h;
+        m_q.at(j).hu = tmp.at(j).hu;
+    }
+
+
 }
 

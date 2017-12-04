@@ -56,8 +56,8 @@ namespace scenarios
             double sigma = 10.0;//3.0;
             //Get relative position in relation to m_size/2
             int x0 = 50;
-            int xl = pos - x0;
-            int xr = (posr) - x0;
+            T xl = pos - x0;
+            T xr = (posr) - x0;
             vect h(2);
             h.at(0) = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(xl/sigma)*(xl/sigma));
             h.at(1) = 1.0/(sigma*(sqrt(2.0*M_PI)))*exp((-1.0/2.0)*(xr/sigma)*(xr/sigma));

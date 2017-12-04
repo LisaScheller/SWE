@@ -26,6 +26,8 @@ private:
     vect m_huNetUpdatesRight;
     //u
     vecq m_q;
+    vecq aq;
+    vecq m_q_bef;
     //Time derivative of u
     vecq m_qt;
     int m_size;
@@ -39,6 +41,8 @@ public:
     GalerkinSWE(vecq q, unsigned int size, T cellsize):
             m_size(size),
             m_q(q.size()),
+            m_q_bef(q.size()),
+            aq(q.size()),
             m_qt(q.size()),
             m_hNetUpdatesRight(size+2,0.0),
             m_hNetUpdatesLeft(size+2,0.0),
@@ -66,6 +70,10 @@ public:
             m_q.at(i).h.u1 = q.at(i).h.u1;
             m_q.at(i).hu.u0 = q.at(i).hu.u0;
             m_q.at(i).hu.u1 = q.at(i).hu.u1;
+            m_q_bef.at(i).h.u0 = q.at(i).h.u0;
+            m_q_bef.at(i).h.u1 = q.at(i).h.u1;
+            m_q_bef.at(i).hu.u0 = q.at(i).hu.u0;
+            m_q_bef.at(i).hu.u1 = q.at(i).hu.u1;
             m_qt.at(i).h.u0 = 0.0;
             m_qt.at(i).h.u1 = 0.0;
             m_qt.at(i).hu.u0 = 0.0;
@@ -125,5 +133,9 @@ public:
     vecq setQ();
 
     vect getExactSolution(T t);
+
+    vecq getAnalyticalSolution(T dt);
+
+    void computeHalfEulerStep(T delta_t);
 };
 #endif //SWE1D_GALERKINSWE_H

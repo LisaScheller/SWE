@@ -24,6 +24,8 @@ private:
     vect m_uNetUpdatesRight;
     //u
     vecu m_u;
+    //Stores original m_u (before midpoint euler step)
+    vecu m_u_bef;
     //Time derivative of u
     vecu m_ut;
     int m_size;
@@ -39,6 +41,7 @@ public:
             a(a_def),
             m_size(size),
             m_u(h.size()),
+            m_u_bef(h.size()),
             m_ut(h.size()),
             m_uNetUpdatesRight(size+2,0.0),
             m_uNetUpdatesLeft(size+2,0.0),
@@ -62,6 +65,8 @@ public:
                 for (unsigned int i = 1; i<size+1; i++){
                     m_u.at(i).u0 = h[i].u0;
                     m_u.at(i).u1 = h[i].u1;
+                    m_u_bef.at(i).u0 = h.at(i).u0;
+                    m_u_bef.at(i).u1 = h.at(i).u1;
                     m_ut.at(i).u0 = 0.0;
                     m_ut.at(i).u1 = 0.0;
                 }
@@ -69,6 +74,10 @@ public:
                 m_u[0].u1 = m_u.at(1).u1;
                 m_u[size+1].u0 = m_u.at(size).u0;
                 m_u[size+1].u1 = m_u.at(size).u1;
+                m_u_bef[0].u0 = m_u_bef.at(1).u0;
+                m_u_bef[0].u1 = m_u_bef.at(1).u1;
+                m_u_bef[size+1].u0 = m_u_bef.at(size).u0;
+                m_u_bef[size+1].u1 = m_u_bef.at(size).u1;
                 m_ut.at(0).u0 = 0.0;
                 m_ut.at(0).u1 = 0.0;
                 m_ut.at(size+1).u0 = 0.0;
@@ -131,6 +140,8 @@ public:
     T getXOfMax();
 
     T computeError(vecu vector);
+
+    void computeHalfEulerStep(T delta_t);
 };
 
 #endif //SWE1D_NODALADVECTION_H

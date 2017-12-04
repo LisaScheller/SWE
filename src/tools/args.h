@@ -60,8 +60,8 @@ private:
 
 public:
 	Args(int argc, char** argv)
-		: m_size(1200.0),
-		  m_timeSteps(1000.0)
+		: m_size(100.0),
+		  m_timeSteps(100.0)
 	{
 		const struct option longOptions[] = {
 			{"size", required_argument, 0, 's'},

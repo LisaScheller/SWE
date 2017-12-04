@@ -175,8 +175,8 @@ void NodalAdvection::computeEulerStep(T delta_t){
     u0.u1 = 0.0;
     vecu tmp(m_size+2,u0);
     for(unsigned int i = 0; i<m_size+2; i++){
-        tmp.at(i).u0=m_u.at(i).u0+(delta_t*m_ut.at(i).u0);
-        tmp.at(i).u1=m_u.at(i).u1+(delta_t*m_ut.at(i).u1);
+        tmp.at(i).u0=m_u_bef.at(i).u0+(delta_t*m_ut.at(i).u0);
+        tmp.at(i).u1=m_u_bef.at(i).u1+(delta_t*m_ut.at(i).u1);
     }
     /*for(unsigned int i = 0; i<m_size+2; i++){
         m_u.at(i).u0=m_u.at(i).u0+(delta_t*m_ut.at(i).u0);
@@ -194,6 +194,23 @@ void NodalAdvection::computeEulerStep(T delta_t){
             m_u.at(j).u0 = tmp.at(j).u0;
         }
     }*/
+    for (unsigned int j = 0; j < m_size+2; j++){
+        m_u.at(j).u0 = tmp.at(j).u0;
+        m_u.at(j).u1 = tmp.at(j).u1;
+        m_u_bef.at(j).u0 = tmp.at(j).u0;
+        m_u_bef.at(j).u1 = tmp.at(j).u1;
+    }
+}
+
+void NodalAdvection::computeHalfEulerStep(T delta_t){
+    u u0;
+    u0.u0 = 0.0;
+    u0.u1 = 0.0;
+    vecu tmp(m_size+2,u0);
+    for(unsigned int i = 0; i<m_size+2; i++){
+        tmp.at(i).u0=m_u.at(i).u0+((0.5*delta_t)*m_ut.at(i).u0);
+        tmp.at(i).u1=m_u.at(i).u1+((0.5*delta_t)*m_ut.at(i).u1);
+    }
     for (unsigned int j = 0; j < m_size+2; j++){
         m_u.at(j).u0 = tmp.at(j).u0;
         m_u.at(j).u1 = tmp.at(j).u1;
