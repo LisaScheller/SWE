@@ -56,12 +56,12 @@
 int main(int argc, char** argv)
 {
     //Choose which scenarios or solvers you want to use
-    bool dambreak = false;
+    bool dambreak = true;
     bool gauss = false;
     bool Adv = false;
     bool AdvDG = false;
-    bool SWE = false;
-    bool SWEDG = true;
+    bool SWE = true;
+    bool SWEDG = false;
     bool SWEDGGauss = false;
 
     //Choose between normal mode and error computing (no vtk output while error computing)
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
         for (unsigned int i = 0; i < numberOfIntervals + 2; i++) {
             hFV.at(i) = scDambreak.getHeight(i);
             ahFV.at(i) = scDambreak.getHeight(i);
-            //huFV.at(i) = scDambreak.getU(i);
+            //huFV.at(i) = hFV.at(i)*scDambreak.getU(i);
         }
     }
     else if (SWE && gauss){
@@ -270,6 +270,9 @@ int main(int argc, char** argv)
                     //ahuFV = wavePropagation.getExactSolutionHu(t);
                     T deltaH = 0.0;
                     T deltaHu = 0.0;
+                    T divH = 0.0;
+                    T divHu = 0.0;
+                    T div  = 0.0;
                     T errorAtI = 0.0;
                     vect errH(numberOfIntervals+2, 0.0);
                     vect  errHu(numberOfIntervals+2, 0.0);
@@ -281,11 +284,14 @@ int main(int argc, char** argv)
                         errHu.at(i) = deltaHu*deltaHu;
                         eH += errH.at(i);
                         eHu += errHu.at(i);
+                        divH += (ahFV.at(i)*ahFV.at(i));
+                        divHu += (ahuFV.at(i)*ahuFV.at(i));
+                        div += divH + divHu;
                         //errorAtI = errH.at(i)+errHu.at(i);
                         //error += errorAtI;
                     }
-                    eH = std::sqrt(scDambreak.getCellSize()*eH);
-                    eHu = std::sqrt(scDambreak.getCellSize()*eHu);
+                    eH = std::sqrt(scDambreak.getCellSize()*(eH/divH));
+                    eHu = std::sqrt(scDambreak.getCellSize()*(eHu/divHu));
                     error = eH+eHu;
                     //error = eH + eHu;
                     //error = std::sqrt(scDambreak.getCellSize()*eH);
@@ -433,6 +439,8 @@ int main(int argc, char** argv)
                     T deltaH1 = 0.0;
                     T deltaHu0 = 0.0;
                     T deltaHu1 = 0.0;
+                    T divH = 0.0;
+                    T divHu = 0.0;
 
                     vect errH(numberOfIntervals+2, 0.0);
                     vect  errHu(numberOfIntervals+2, 0.0);
@@ -446,10 +454,11 @@ int main(int argc, char** argv)
                         errHu.at(i) = (deltaHu0*deltaHu0) + (deltaHu1*deltaHu1);
                         eH += errH.at(i);
                         eHu += errHu.at(i);
-
+                        divH += (aq.at(i).h.u0*aq.at(i).h.u0)+(aq.at(i).h.u1*aq.at(i).h.u1);
+                        divHu += (aq.at(i).hu.u0*aq.at(i).hu.u0)+(aq.at(i).hu.u1*aq.at(i).hu.u1);
                     }
-                    eH = std::sqrt(scDambreak.getCellSize()*eH);
-                    eHu = std::sqrt(scDambreak.getCellSize()*eHu);
+                    eH = std::sqrt(scDambreak.getCellSize()*(eH/divH));
+                    eHu = std::sqrt(scDambreak.getCellSize()*(eHu/divHu));
                     error = eH+eHu;
                 }
             }

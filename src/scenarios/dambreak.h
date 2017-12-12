@@ -61,7 +61,6 @@ public:
 	{
 		if (pos <= m_size/2)
 			return 3;
-
 		return 1;
 	}
 

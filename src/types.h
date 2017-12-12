@@ -43,11 +43,11 @@
 // Switch precision here
 //typedef float T;
 typedef long double T;
-typedef struct u{
+struct u{
     T u0;
     T u1;
 };
-typedef struct q{
+struct q{
     u h;
     u hu;
 };

@@ -251,11 +251,30 @@ vect NodalAdvection::getExactSolution(T t, int numberOfIntervals){
 
 T NodalAdvection::computeError(vecu h0) {
     T res = 0.0;
+    T div = 0.0;
+
     for(unsigned int i = 1; i<m_size+1; i++){
+        /*T excT = h0.at(i).u0;
+        T excM = (h0.at(i).u1 - excT);
+        T excInt = ((excM/2) + excT)*m_cellSize;
+        T numT = m_u.at(i).u0;
+        T numM = (m_u.at(i).u1 - numT);
+        T numInt = ((numM/2) + numT)*m_cellSize;
+        res = (numInt-excInt)*(numInt-excInt);*/
         res += std::abs((m_u.at(i).u0 - h0.at(i).u0)*(m_u.at(i).u0 - h0.at(i).u0));
         res += std::abs((m_u.at(i).u1 - h0.at(i).u1)*(m_u.at(i).u1 - h0.at(i).u1));
+
+        div += h0.at(i).u0*h0.at(i).u0;
+        div += h0.at(i).u1*h0.at(i).u1;
+
+        /*T uexc = (h0.at(i).u0+h0.at(i).u1)/2.0;
+        T unum = (m_u.at(i).u0+m_u.at(i).u1)/2.0;
+        res += std::abs((unum-uexc)*(unum-uexc));*/
     }
-    return std::sqrt(m_cellSize*res);
+    //return std::sqrt(res/div);
+    return std::sqrt(m_cellSize*(res/div));
+    //return std::sqrt(m_cellSize*res);
+
 }
 
 

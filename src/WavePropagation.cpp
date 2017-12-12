@@ -85,7 +85,7 @@ vecu WavePropagation::updateUnknownsUnstable(T dt){
 
 vecu WavePropagation::updateUnknownsLaxFriedrichs(T dt){
    return solver.updateUnknownsLocalLaxFriedrichs(dt);
-    //solver.updateUnknownsLaxFriedrichs(dt);
+    //return solver.updateUnknownsLaxFriedrichs(dt);
     //solver.updateUnknownsLaxFriedrichsDirect(dt);
     //return solver.updateUnknownsLaxFriedrichs2(dt);
     solver.solveAnalytically(dt);

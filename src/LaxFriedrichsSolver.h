@@ -54,7 +54,7 @@ public:
     //time of current timestep to compute provisoric dt
     T computeLaxFriedrichsFlux2(T t);
 
-    void updateUnknownsLaxFriedrichs(T dt);
+    vecu updateUnknownsLaxFriedrichs(T dt);
     vecu updateUnknownsLaxFriedrichs2(T dt);
     void updateUnknownsLaxFriedrichsDirect(T dt);
 

@@ -1,5 +1,5 @@
 //
-// Created by lisa on 26.11.17.
+// Created by Lisa Scheller on 26.11.17.
 //
 
 #include "AdvectionFiniteVolumes.h"
@@ -62,15 +62,17 @@ vect AdvectionFiniteVolumes::setU() {
 
 T AdvectionFiniteVolumes::computeError(vect u0) {
     T res = 0.0;
-    //T div = 0.0;
+    T div = 0.0;
     for(unsigned int i = 1; i<m_size+1; i++){
         //res += std::abs((m_u.at(i) - u0.at(i))*(m_u.at(i) - u0.at(i)));
         //res += std::abs(m_u.at(i)- u0.at(i));
         res += std::abs((m_u.at(i) - u0.at(i))*(m_u.at(i) - u0.at(i)));
+        div += (u0.at(i)*u0.at(i));
         //div += (u0.at(i)*u0.at(i));
     }
     //return std::sqrt(res);
     //return m_cellSize*res;
-    return std::sqrt(m_cellSize*res);
+    //return std::sqrt(m_cellSize*res);
+    return std::sqrt(m_cellSize*(res/div));
     //return res/div;
 }

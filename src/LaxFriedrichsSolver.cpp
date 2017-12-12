@@ -107,7 +107,7 @@ T LaxFriedrichsSolver::computeLaxFriedrichsFlux2(T t) {
     }
     // Compute CFL condition (with Courant number 0.4)
 
-    T maxTimeStep = m_cellSize/maxWaveSpeed * 0.04;
+    T maxTimeStep = m_cellSize/maxWaveSpeed * 0.4;
 
     return maxTimeStep;
 }
@@ -145,14 +145,18 @@ T LaxFriedrichsSolver::computeLocalLaxFriedrichsFlux(T t){
 }
 
 
-void LaxFriedrichsSolver::updateUnknownsLaxFriedrichs(T dt){
+vecu LaxFriedrichsSolver::updateUnknownsLaxFriedrichs(T dt){
     //Original method using the calculated Fluxes to compute h and hu at i
     //Loop over all inner cells
     //Leveque S. 71
+    vecu res(m_size+2);
     for (unsigned int i = 1; i < m_size+1; i++){
-        m_h.at(i) = ((m_h.at(i-1)+m_h.at(i+1))/2) + dt/2*m_cellSize*(m_hNetUpdatesLeft.at(i)-m_hNetUpdatesRight.at(i));
-        m_hu.at(i) = ((m_hu.at(i-1)+m_hu.at(i+1))/2) + dt/2*m_cellSize*(m_huNetUpdatesLeft.at(i)-m_huNetUpdatesRight.at(i));
+        m_h.at(i) = ((m_h.at(i-1)+m_h.at(i+1))/2) + ((dt/2*m_cellSize)*(m_hNetUpdatesLeft.at(i)-m_hNetUpdatesRight.at(i)));
+        m_hu.at(i) = ((m_hu.at(i-1)+m_hu.at(i+1))/2) + ((dt/2*m_cellSize)*(m_huNetUpdatesLeft.at(i)-m_huNetUpdatesRight.at(i)));
+        res.at(i).u0 = m_h.at(i);
+        res.at(i).u1 = m_hu.at(i);
 }
+    return res;
 
 }
 
